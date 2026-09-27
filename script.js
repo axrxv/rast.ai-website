@@ -12,7 +12,7 @@ const newChatButton =
 
 
 const BACKEND_URL =
-    "YOUR_RENDER_URL_HERE";
+    "https://rast-ai.onrender.com";
 
 
 function addMessage(text, type) {
