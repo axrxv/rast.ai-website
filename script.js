@@ -2,7 +2,6 @@
    RAST.AI FRONTEND
    ========================================= */
 
-// Paste your actual Gemini API Key inside quotes below
 const GEMINI_API_KEY = "AQ.Ab8RN6I92UFna8E1Dkr9t7dbFD9mhucD4pwgIfvZOkOza_4VGQ";
 
 const messages =
@@ -312,7 +311,7 @@ function setMode(
 
 
 /* =========================================
-   SEND MESSAGE (DIRECT GEMINI API INTEGRATION)
+   SEND MESSAGE
    ========================================= */
 
 async function sendMessage(
@@ -370,13 +369,12 @@ async function sendMessage(
 
     try {
 
-        // System instruction context based on mode selection
         const systemPrompt = currentMode === "design"
             ? "You are rast.ai Design Studio, an expert graphic designer and brand strategist. Generate high-quality visual concepts, vertical graphic layouts, color palettes, typography specs, and creative briefs. Avoid including real-life people in design descriptions unless explicitly requested."
             : "You are rast.ai, an AI & Design Assistant. Provide concise, helpful, and creative responses.";
 
         const response = await fetch(
-            `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${GEMINI_API_KEY}`,
+            `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.8-flash:generateContent?key=${GEMINI_API_KEY}`,
             {
                 method: "POST",
                 headers: {
