@@ -2,6 +2,8 @@
    RAST.AI FRONTEND
    ========================================= */
 
+// Paste your actual Gemini API Key inside quotes below
+const GEMINI_API_KEY = "YOUR_GEMINI_API_KEY_HERE";
 
 const messages =
     document.getElementById("messages");
@@ -28,35 +30,13 @@ const pageTitle =
     document.getElementById("pageTitle");
 
 
-/*
-==================================================
-IMPORTANT
-
-PUT YOUR EXISTING RENDER URL HERE.
-
-Example:
-
-https://rast-ai-xxxx.onrender.com
-
-DO NOT ADD /chat
-DO NOT PUT YOUR GEMINI API KEY HERE
-==================================================
-*/
-
-
-const BACKEND_URL =
-    "https://rast-ai.onrender.com";
-
-
 let currentMode =
     "chat";
-
 
 
 /* =========================================
    ADD MESSAGE
    ========================================= */
-
 
 function addMessage(
     text,
@@ -84,11 +64,9 @@ function addMessage(
 }
 
 
-
 /* =========================================
    HERO
    ========================================= */
-
 
 function showWelcome() {
 
@@ -153,7 +131,7 @@ function showWelcome() {
 
                     <button
                         class="quick-card"
-                        data-prompt="Create a premium Instagram post concept for a modern technology startup. Give me the headline, copy, layout, visual direction, colors, typography and CTA."
+                        data-prompt="Create a premium vertical marketing creative layout excluding human images. Focus on typography, graphic hierarchy, layout, color palette, and compelling copy."
                     >
 
                         <div class="quick-icon">
@@ -163,11 +141,11 @@ function showWelcome() {
                         <div>
 
                             <strong>
-                                Instagram
+                                Creative Design
                             </strong>
 
                             <small>
-                                Social creative
+                                Layout & Direction
                             </small>
 
                         </div>
@@ -178,7 +156,7 @@ function showWelcome() {
 
                     <button
                         class="quick-card"
-                        data-prompt="Create a high-end advertising creative for a startup. Give me the complete visual concept, headline, supporting copy, layout, colors, typography and CTA."
+                        data-prompt="Create a high-end advertising creative concept. Give me the complete visual concept, headline, supporting copy, layout, colors, typography and CTA."
                     >
 
                         <div class="quick-icon">
@@ -264,11 +242,9 @@ function showWelcome() {
 }
 
 
-
 /* =========================================
    MODE
    ========================================= */
-
 
 function setMode(
     mode
@@ -335,11 +311,9 @@ function setMode(
 }
 
 
-
 /* =========================================
-   SEND MESSAGE
+   SEND MESSAGE (DIRECT GEMINI API INTEGRATION)
    ========================================= */
-
 
 async function sendMessage(
     customText = null
@@ -396,53 +370,40 @@ async function sendMessage(
 
     try {
 
+        // System instruction context based on mode selection
+        const systemPrompt = currentMode === "design"
+            ? "You are rast.ai Design Studio, an expert graphic designer and brand strategist. Generate high-quality visual concepts, vertical graphic layouts, color palettes, typography specs, and creative briefs. Avoid including real-life people in design descriptions unless explicitly requested."
+            : "You are rast.ai, an AI & Design Assistant. Provide concise, helpful, and creative responses.";
 
-        const response =
-            await fetch(
-                `${BACKEND_URL}/chat`,
-                {
-
-                    method:
-                        "POST",
-
-                    headers:
+        const response = await fetch(
+            `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${GEMINI_API_KEY}`,
+            {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    contents: [
                         {
-                            "Content-Type":
-                                "application/json"
-                        },
+                            parts: [
+                                { text: `${systemPrompt}\n\nUser request: ${text}` }
+                            ]
+                        }
+                    ]
+                })
+            }
+        );
 
-                    body:
-                        JSON.stringify({
-
-                            message:
-                                text,
-
-                            mode:
-                                currentMode
-
-                        })
-
-                }
-            );
-
-
-        const data =
-            await response.json();
-
+        const data = await response.json();
 
         if (!response.ok) {
-
             throw new Error(
-                data.error ||
-                "Something went wrong."
+                data.error?.message || "Gemini API request failed."
             );
-
         }
 
-
-        thinking.textContent =
-            data.reply;
-
+        const reply = data.candidates[0].content.parts[0].text;
+        thinking.textContent = reply;
 
     } catch (error) {
 
@@ -451,9 +412,8 @@ async function sendMessage(
             error
         );
 
-
         thinking.textContent =
-            "Sorry, something went wrong. Please try again.";
+            "Sorry, something went wrong. Please check your API key and try again.";
 
     } finally {
 
@@ -467,11 +427,9 @@ async function sendMessage(
 }
 
 
-
 /* =========================================
    QUICK ACTIONS
    ========================================= */
-
 
 function attachQuickButtons() {
 
@@ -499,11 +457,9 @@ function attachQuickButtons() {
 }
 
 
-
 /* =========================================
    SEND BUTTON
    ========================================= */
-
 
 sendButton.addEventListener(
     "click",
@@ -515,11 +471,9 @@ sendButton.addEventListener(
 );
 
 
-
 /* =========================================
    ENTER TO SEND
    ========================================= */
-
 
 input.addEventListener(
     "keydown",
@@ -540,11 +494,9 @@ input.addEventListener(
 );
 
 
-
 /* =========================================
    TEXTAREA AUTO-GROW
    ========================================= */
-
 
 input.addEventListener(
     "input",
@@ -563,11 +515,9 @@ input.addEventListener(
 );
 
 
-
 /* =========================================
    NEW CHAT
    ========================================= */
-
 
 newChatButton.addEventListener(
     "click",
@@ -587,11 +537,9 @@ newChatButton.addEventListener(
 );
 
 
-
 /* =========================================
    MODE BUTTONS
    ========================================= */
-
 
 chatModeButton.addEventListener(
     "click",
@@ -613,10 +561,8 @@ designModeButton.addEventListener(
 );
 
 
-
 /* =========================================
    START
    ========================================= */
-
 
 showWelcome();
