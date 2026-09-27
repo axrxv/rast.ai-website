@@ -1,3 +1,8 @@
+/* =========================================
+   RAST.AI FRONTEND
+   ========================================= */
+
+
 const messages =
     document.getElementById("messages");
 
@@ -24,24 +29,39 @@ const pageTitle =
 
 
 /*
-    IMPORTANT:
-    Replace this with your existing Render URL.
+==================================================
+IMPORTANT
 
-    Example:
+PUT YOUR EXISTING RENDER URL HERE.
 
-    https://rast-ai-xxxx.onrender.com
+Example:
 
-    DO NOT add /chat.
+https://rast-ai-xxxx.onrender.com
+
+DO NOT ADD /chat
+DO NOT PUT YOUR GEMINI API KEY HERE
+==================================================
 */
 
+
 const BACKEND_URL =
-    "https://rast-ai.onrender.com";
+    "YOUR_EXISTING_RENDER_URL_HERE";
 
 
-let currentMode = "chat";
+let currentMode =
+    "chat";
 
 
-function addMessage(text, type) {
+
+/* =========================================
+   ADD MESSAGE
+   ========================================= */
+
+
+function addMessage(
+    text,
+    type
+) {
 
     const message =
         document.createElement("div");
@@ -49,15 +69,25 @@ function addMessage(text, type) {
     message.className =
         `message ${type}`;
 
-    message.textContent = text;
+    message.textContent =
+        text;
 
-    messages.appendChild(message);
+    messages.appendChild(
+        message
+    );
 
     messages.scrollTop =
         messages.scrollHeight;
 
     return message;
+
 }
+
+
+
+/* =========================================
+   HERO
+   ========================================= */
 
 
 function showWelcome() {
@@ -66,67 +96,161 @@ function showWelcome() {
 
         <div class="hero">
 
-            <div class="hero-badge">
-                ${
-                    currentMode === "design"
-                    ? "DESIGN STUDIO"
-                    : "AI + DESIGN"
-                }
-            </div>
+            <div class="hero-image"></div>
 
-            <h1>
-                ${
-                    currentMode === "design"
-                    ? "Turn ideas into<br><span>great design.</span>"
-                    : "Build ideas.<br>Make them <span>stand out.</span>"
-                }
-            </h1>
+            <div class="hero-overlay"></div>
 
-            <p>
-                ${
-                    currentMode === "design"
-                    ? "Create campaign concepts, brand systems, social creatives, UI directions and production-ready design briefs."
-                    : "Chat, brainstorm, create campaigns, develop brands and turn ideas into production-ready concepts."
-                }
-            </p>
+            <div class="hero-content">
+
+                <div class="hero-pill">
+
+                    <span class="pill-dot"></span>
+
+                    ${
+                        currentMode === "design"
+                        ? "DESIGN STUDIO"
+                        : "AI + DESIGN"
+                    }
+
+                </div>
 
 
-            <div class="quick-grid">
+                <h1>
 
-                <button
-                    class="quick-card"
-                    data-prompt="Create a modern Instagram post for a technology startup. Give me the complete design concept, headline, copy, layout, colors, typography and CTA."
-                >
-                    <strong>Instagram Post</strong>
-                    <small>Social creative</small>
-                </button>
+                    ${
+                        currentMode === "design"
 
+                        ? `Turn ideas into<br>
+                           <span>something visual.</span>`
 
-                <button
-                    class="quick-card"
-                    data-prompt="Create a premium advertising creative for a startup. Give me the visual concept, headline, supporting copy, layout, typography, colors and CTA."
-                >
-                    <strong>Ad Creative</strong>
-                    <small>Campaign concept</small>
-                </button>
+                        : `Turn ideas into<br>
+                           <span>something remarkable.</span>`
+                    }
+
+                </h1>
 
 
-                <button
-                    class="quick-card"
-                    data-prompt="Create a modern brand identity concept for a new startup. Include brand personality, colors, typography, logo direction and visual language."
-                >
-                    <strong>Brand Identity</strong>
-                    <small>Brand system</small>
-                </button>
+                <p>
+
+                    ${
+                        currentMode === "design"
+
+                        ? `Create campaign concepts,
+                           brand systems, social creatives,
+                           UI directions and production-ready
+                           design briefs.`
+
+                        : `Chat, brainstorm, create campaigns,
+                           build brands and transform ideas
+                           into clear, creative concepts.`
+                    }
+
+                </p>
 
 
-                <button
-                    class="quick-card"
-                    data-prompt="Create a clean modern landing page UI concept for a technology startup. Describe the layout, sections, typography, colors and user experience."
-                >
-                    <strong>UI Concept</strong>
-                    <small>Product design</small>
-                </button>
+                <div class="quick-actions">
+
+
+                    <button
+                        class="quick-card"
+                        data-prompt="Create a premium Instagram post concept for a modern technology startup. Give me the headline, copy, layout, visual direction, colors, typography and CTA."
+                    >
+
+                        <div class="quick-icon">
+                            ↗
+                        </div>
+
+                        <div>
+
+                            <strong>
+                                Instagram
+                            </strong>
+
+                            <small>
+                                Social creative
+                            </small>
+
+                        </div>
+
+                    </button>
+
+
+
+                    <button
+                        class="quick-card"
+                        data-prompt="Create a high-end advertising creative for a startup. Give me the complete visual concept, headline, supporting copy, layout, colors, typography and CTA."
+                    >
+
+                        <div class="quick-icon">
+                            ◉
+                        </div>
+
+                        <div>
+
+                            <strong>
+                                Ad Creative
+                            </strong>
+
+                            <small>
+                                Campaign concept
+                            </small>
+
+                        </div>
+
+                    </button>
+
+
+
+                    <button
+                        class="quick-card"
+                        data-prompt="Create a complete modern brand identity direction for a startup. Include brand personality, logo direction, colors, typography, imagery and visual language."
+                    >
+
+                        <div class="quick-icon">
+                            ◆
+                        </div>
+
+                        <div>
+
+                            <strong>
+                                Branding
+                            </strong>
+
+                            <small>
+                                Identity direction
+                            </small>
+
+                        </div>
+
+                    </button>
+
+
+
+                    <button
+                        class="quick-card"
+                        data-prompt="Create a premium landing page UI concept for an AI startup. Describe the sections, hierarchy, typography, colors, components and user experience."
+                    >
+
+                        <div class="quick-icon">
+                            □
+                        </div>
+
+                        <div>
+
+                            <strong>
+                                UI / UX
+                            </strong>
+
+                            <small>
+                                Product design
+                            </small>
+
+                        </div>
+
+                    </button>
+
+
+                </div>
 
             </div>
 
@@ -140,15 +264,31 @@ function showWelcome() {
 }
 
 
-function setMode(mode) {
 
-    currentMode = mode;
+/* =========================================
+   MODE
+   ========================================= */
 
-    if (mode === "design") {
 
-        designModeButton.classList.add("active");
+function setMode(
+    mode
+) {
 
-        chatModeButton.classList.remove("active");
+    currentMode =
+        mode;
+
+
+    if (
+        mode === "design"
+    ) {
+
+        designModeButton
+            .classList
+            .add("active");
+
+        chatModeButton
+            .classList
+            .remove("active");
 
         modeLabel.textContent =
             "DESIGN STUDIO";
@@ -156,18 +296,23 @@ function setMode(mode) {
         pageTitle.textContent =
             "Design Studio";
 
-        document.body.classList.add(
-            "design-mode"
-        );
-
         input.placeholder =
             "Describe the design you want...";
 
+        document.body
+            .classList
+            .add("design-mode");
+
+
     } else {
 
-        chatModeButton.classList.add("active");
+        chatModeButton
+            .classList
+            .add("active");
 
-        designModeButton.classList.remove("active");
+        designModeButton
+            .classList
+            .remove("active");
 
         modeLabel.textContent =
             "CHAT";
@@ -175,36 +320,51 @@ function setMode(mode) {
         pageTitle.textContent =
             "rast.ai";
 
-        document.body.classList.remove(
-            "design-mode"
-        );
-
         input.placeholder =
             "Ask rast.ai anything...";
 
+        document.body
+            .classList
+            .remove("design-mode");
+
     }
+
 
     showWelcome();
 
 }
 
 
-async function sendMessage(customText = null) {
+
+/* =========================================
+   SEND MESSAGE
+   ========================================= */
+
+
+async function sendMessage(
+    customText = null
+) {
 
     const text =
         customText ||
         input.value.trim();
 
+
     if (!text) {
+
         return;
+
     }
 
 
-    const welcome =
+    const hero =
         document.querySelector(".hero");
 
-    if (welcome) {
-        welcome.remove();
+
+    if (hero) {
+
+        hero.remove();
+
     }
 
 
@@ -214,13 +374,14 @@ async function sendMessage(customText = null) {
     );
 
 
-    input.value = "";
+    input.value =
+        "";
 
     input.style.height =
         "auto";
 
 
-    const thinkingMessage =
+    const thinking =
         addMessage(
             currentMode === "design"
                 ? "Creating your design concept..."
@@ -229,29 +390,38 @@ async function sendMessage(customText = null) {
         );
 
 
-    sendButton.disabled = true;
+    sendButton.disabled =
+        true;
 
 
     try {
+
 
         const response =
             await fetch(
                 `${BACKEND_URL}/chat`,
                 {
-                    method: "POST",
 
-                    headers: {
-                        "Content-Type":
-                            "application/json"
-                    },
+                    method:
+                        "POST",
 
-                    body: JSON.stringify({
+                    headers:
+                        {
+                            "Content-Type":
+                                "application/json"
+                        },
 
-                        message: text,
+                    body:
+                        JSON.stringify({
 
-                        mode: currentMode
+                            message:
+                                text,
 
-                    })
+                            mode:
+                                currentMode
+
+                        })
+
                 }
             );
 
@@ -270,20 +440,25 @@ async function sendMessage(customText = null) {
         }
 
 
-        thinkingMessage.textContent =
+        thinking.textContent =
             data.reply;
 
 
     } catch (error) {
 
-        console.error(error);
+        console.error(
+            "rast.ai error:",
+            error
+        );
 
-        thinkingMessage.textContent =
+
+        thinking.textContent =
             "Sorry, something went wrong. Please try again.";
 
     } finally {
 
-        sendButton.disabled = false;
+        sendButton.disabled =
+            false;
 
         input.focus();
 
@@ -292,43 +467,63 @@ async function sendMessage(customText = null) {
 }
 
 
+
+/* =========================================
+   QUICK ACTIONS
+   ========================================= */
+
+
 function attachQuickButtons() {
 
     document
         .querySelectorAll(
             "[data-prompt]"
         )
-        .forEach(button => {
+        .forEach(
+            button => {
 
-            button.addEventListener(
-                "click",
-                () => {
+                button.addEventListener(
+                    "click",
+                    () => {
 
-                    sendMessage(
-                        button.dataset.prompt
-                    );
+                        sendMessage(
+                            button.dataset.prompt
+                        );
 
-                }
-            );
+                    }
+                );
 
-        });
+            }
+        );
 
 }
 
 
-/* SEND */
+
+/* =========================================
+   SEND BUTTON
+   ========================================= */
+
 
 sendButton.addEventListener(
     "click",
-    () => sendMessage()
+    () => {
+
+        sendMessage();
+
+    }
 );
 
 
-/* ENTER */
+
+/* =========================================
+   ENTER TO SEND
+   ========================================= */
+
 
 input.addEventListener(
     "keydown",
-    function(event) {
+    event => {
 
         if (
             event.key === "Enter" &&
@@ -345,7 +540,11 @@ input.addEventListener(
 );
 
 
-/* AUTO GROW */
+
+/* =========================================
+   TEXTAREA AUTO-GROW
+   ========================================= */
+
 
 input.addEventListener(
     "input",
@@ -357,22 +556,30 @@ input.addEventListener(
         this.style.height =
             Math.min(
                 this.scrollHeight,
-                140
+                130
             ) + "px";
 
     }
 );
 
 
-/* NEW CHAT */
+
+/* =========================================
+   NEW CHAT
+   ========================================= */
+
 
 newChatButton.addEventListener(
     "click",
-    function() {
+    () => {
 
         showWelcome();
 
-        input.value = "";
+        input.value =
+            "";
+
+        input.style.height =
+            "auto";
 
         input.focus();
 
@@ -380,20 +587,36 @@ newChatButton.addEventListener(
 );
 
 
-/* MODES */
+
+/* =========================================
+   MODE BUTTONS
+   ========================================= */
+
 
 chatModeButton.addEventListener(
     "click",
-    () => setMode("chat")
+    () => {
+
+        setMode("chat");
+
+    }
 );
 
 
 designModeButton.addEventListener(
     "click",
-    () => setMode("design")
+    () => {
+
+        setMode("design");
+
+    }
 );
 
 
-/* INITIALIZE */
 
-attachQuickButtons();
+/* =========================================
+   START
+   ========================================= */
+
+
+showWelcome();
