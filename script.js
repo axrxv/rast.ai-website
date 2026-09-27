@@ -3,7 +3,7 @@
    ========================================= */
 
 // Paste your actual Gemini API Key inside quotes below
-const GEMINI_API_KEY = "YOUR_GEMINI_API_KEY_HERE";
+const GEMINI_API_KEY = "AQ.Ab8RN6I92UFna8E1Dkr9t7dbFD9mhucD4pwgIfvZOkOza_4VGQ";
 
 const messages =
     document.getElementById("messages");
