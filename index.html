@@ -1,439 +1,256 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
-
     <meta charset="UTF-8">
-
-    <meta
-        name="viewport"
-        content="width=device-width, initial-scale=1.0"
-    >
-
-    <meta
-        name="description"
-        content="rast.ai — AI and Design Studio"
-    >
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     <title>rast.ai — AI & Design Studio</title>
 
-    <link
-        rel="preconnect"
-        href="https://fonts.googleapis.com"
-    >
-
-    <link
-        rel="preconnect"
-        href="https://fonts.gstatic.com"
-        crossorigin
-    >
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 
     <link
         href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
         rel="stylesheet"
     >
 
-    <!-- v3 prevents GitHub Pages from using the old cached CSS -->
-    <link
-        rel="stylesheet"
-        href="style.css?v=3"
-    >
-
+    <link rel="stylesheet" href="style.css?v=3">
 </head>
-
 
 <body>
 
-<div class="app">
+    <div class="app">
 
+        <!-- SIDEBAR -->
+        <aside class="sidebar">
 
-    <!-- ========================= -->
-    <!-- SIDEBAR -->
-    <!-- ========================= -->
+            <div class="brand">
+                <div class="brand-mark">r</div>
 
-    <aside class="sidebar">
-
-        <div class="brand">
-
-            <div class="brand-logo">
-                r
+                <div>
+                    <div class="brand-name">rast.ai</div>
+                    <div class="brand-subtitle">AI & Design Studio</div>
+                </div>
             </div>
 
-            <div class="brand-text">
+            <div class="sidebar-section">
 
-                <div class="brand-name">
-                    rast.ai
+                <div class="section-label">
+                    WORKSPACE
                 </div>
 
-                <div class="brand-tagline">
-                    AI & Design Studio
-                </div>
-
-            </div>
-
-        </div>
-
-
-        <div class="sidebar-divider"></div>
-
-
-        <div class="sidebar-label">
-            WORKSPACE
-        </div>
-
-
-        <button
-            class="sidebar-button active"
-            id="chatModeButton"
-        >
-
-            <span class="button-icon">
-                ✦
-            </span>
-
-            <span>
-                Chat
-            </span>
-
-        </button>
-
-
-        <button
-            class="sidebar-button"
-            id="designModeButton"
-        >
-
-            <span class="button-icon">
-                ◈
-            </span>
-
-            <span>
-                Design Studio
-            </span>
-
-        </button>
-
-
-        <div class="sidebar-label tools-label">
-            CREATIVE TOOLS
-        </div>
-
-
-        <button
-            class="sidebar-tool"
-            data-prompt="Create a premium Instagram post concept for a modern technology startup. Give me the headline, copy, layout, visual direction, colors, typography and CTA."
-        >
-            <span>Instagram</span>
-            <span class="tool-arrow">→</span>
-        </button>
-
-
-        <button
-            class="sidebar-tool"
-            data-prompt="Create a high-end advertising creative for a startup. Give me the complete visual concept, headline, supporting copy, layout, colors, typography and CTA."
-        >
-            <span>Ad Creative</span>
-            <span class="tool-arrow">→</span>
-        </button>
-
-
-        <button
-            class="sidebar-tool"
-            data-prompt="Create a complete modern brand identity direction for a startup. Include brand personality, logo direction, colors, typography, imagery and visual language."
-        >
-            <span>Brand Identity</span>
-            <span class="tool-arrow">→</span>
-        </button>
-
-
-        <button
-            class="sidebar-tool"
-            data-prompt="Create a premium landing page UI concept for an AI startup. Describe the sections, hierarchy, typography, colors, components and user experience."
-        >
-            <span>UI Concept</span>
-            <span class="tool-arrow">→</span>
-        </button>
-
-
-        <div class="sidebar-bottom">
-
-            <div class="online-status">
-
-                <span class="online-dot"></span>
-
-                <span>
-                    AI online
-                </span>
-
-            </div>
-
-            <div class="sidebar-version">
-                rast.ai • 2026
-            </div>
-
-        </div>
-
-    </aside>
-
-
-
-    <!-- ========================= -->
-    <!-- MAIN AREA -->
-    <!-- ========================= -->
-
-    <main class="main">
-
-
-        <!-- TOP BAR -->
-
-        <header class="topbar">
-
-            <div class="topbar-left">
-
-                <div
-                    class="mode-label"
-                    id="modeLabel"
-                >
-                    CHAT
-                </div>
-
-                <h2 id="pageTitle">
-                    rast.ai
-                </h2>
-
-            </div>
-
-
-            <button
-                class="new-chat"
-                id="newChat"
-            >
-                <span>＋</span>
-                New Chat
-            </button>
-
-        </header>
-
-
-
-        <!-- ========================= -->
-        <!-- CONTENT -->
-        <!-- ========================= -->
-
-        <section
-            class="content"
-            id="messages"
-        >
-
-
-            <!-- HERO -->
-
-            <div
-                class="hero"
-                id="hero"
-            >
-
-                <div class="hero-image"></div>
-
-                <div class="hero-overlay"></div>
-
-
-                <div class="hero-content">
-
-                    <div class="hero-pill">
-                        <span class="pill-dot"></span>
-                        AI + DESIGN
-                    </div>
-
-
-                    <h1>
-
-                        Turn ideas into
-                        <br>
-
-                        <span>
-                            something remarkable.
-                        </span>
-
-                    </h1>
-
-
-                    <p>
-
-                        Chat, brainstorm, create campaigns,
-                        build brands and transform ideas into
-                        clear, creative concepts.
-
-                    </p>
-
-
-                    <div class="quick-actions">
-
-
-                        <button
-                            class="quick-card"
-                            data-prompt="Give me 10 creative marketing campaign ideas for a modern startup."
-                        >
-
-                            <div class="quick-icon">
-                                ↗
-                            </div>
-
-                            <div>
-
-                                <strong>
-                                    Marketing
-                                </strong>
-
-                                <small>
-                                    Campaign ideas
-                                </small>
-
-                            </div>
-
-                        </button>
-
-
-
-                        <button
-                            class="quick-card"
-                            data-prompt="Give me 7 unique social media creative concepts for a premium modern brand."
-                        >
-
-                            <div class="quick-icon">
-                                ◉
-                            </div>
-
-                            <div>
-
-                                <strong>
-                                    Social Media
-                                </strong>
-
-                                <small>
-                                    Creative concepts
-                                </small>
-
-                            </div>
-
-                        </button>
-
-
-
-                        <button
-                            class="quick-card"
-                            data-prompt="Create a premium brand identity concept for a new startup. Include personality, logo direction, colors and typography."
-                        >
-
-                            <div class="quick-icon">
-                                ◆
-                            </div>
-
-                            <div>
-
-                                <strong>
-                                    Branding
-                                </strong>
-
-                                <small>
-                                    Identity direction
-                                </small>
-
-                            </div>
-
-                        </button>
-
-
-
-                        <button
-                            class="quick-card"
-                            data-prompt="Create a modern landing page concept for an AI startup. Give me the complete UI structure and visual direction."
-                        >
-
-                            <div class="quick-icon">
-                                □
-                            </div>
-
-                            <div>
-
-                                <strong>
-                                    UI / UX
-                                </strong>
-
-                                <small>
-                                    Product design
-                                </small>
-
-                            </div>
-
-                        </button>
-
-
-                    </div>
-
-                </div>
-
-            </div>
-
-
-        </section>
-
-
-
-        <!-- ========================= -->
-        <!-- COMPOSER -->
-        <!-- ========================= -->
-
-        <div class="composer-area">
-
-
-            <div class="composer">
-
-
-                <textarea
-                    id="messageInput"
-                    rows="1"
-                    placeholder="Ask rast.ai anything..."
-                ></textarea>
-
-
-                <button
-                    class="send-button"
-                    id="sendButton"
-                    aria-label="Send"
-                >
-                    ↑
+                <button class="nav-item active" id="chatMode">
+                    <span class="nav-icon">✦</span>
+                    <span>Chat</span>
                 </button>
 
+                <button class="nav-item" id="designMode">
+                    <span class="nav-icon">◈</span>
+                    <span>Design Studio</span>
+                </button>
 
             </div>
 
 
-            <div class="composer-info">
+            <div class="sidebar-section">
 
-                <span>
-                    rast.ai can make mistakes. Check important information.
-                </span>
+                <div class="section-label">
+                    CREATIVE TOOLS
+                </div>
 
-                <span>
-                    AI & Design Studio
-                </span>
+                <button class="tool-item" data-prompt="Create a premium Instagram post concept for a modern brand.">
+                    <span>◎</span>
+                    Instagram
+                </button>
+
+                <button class="tool-item" data-prompt="Create a high-converting advertising creative concept for a modern brand.">
+                    <span>▣</span>
+                    Ad Creative
+                </button>
+
+                <button class="tool-item" data-prompt="Create a complete brand identity concept including colors, typography, logo direction and visual style.">
+                    <span>◇</span>
+                    Brand Identity
+                </button>
+
+                <button class="tool-item" data-prompt="Create a modern premium UI concept for a digital product.">
+                    <span>⌘</span>
+                    UI Concept
+                </button>
 
             </div>
 
 
-        </div>
+            <div class="sidebar-bottom">
+
+                <div class="status">
+                    <span class="status-dot"></span>
+                    <span>AI Online</span>
+                </div>
+
+                <div class="sidebar-footer">
+                    Built with rast.ai
+                </div>
+
+            </div>
+
+        </aside>
 
 
-    </main>
+        <!-- MAIN -->
+        <main class="main">
 
-</div>
+            <!-- TOP BAR -->
+            <header class="topbar">
+
+                <div class="mode-info">
+                    <span class="mode-indicator"></span>
+                    <span id="modeLabel">AI Chat</span>
+                </div>
+
+                <button class="new-chat" id="newChat">
+                    <span>＋</span>
+                    New Chat
+                </button>
+
+            </header>
 
 
-<!-- v3 prevents old JavaScript caching -->
+            <!-- CONTENT -->
+            <section class="content">
 
-<script src="script.js?v=3"></script>
+                <!-- HERO -->
+                <div class="hero">
+
+                    <div class="hero-overlay"></div>
+
+                    <div class="hero-content">
+
+                        <div class="eyebrow">
+                            <span>✦</span>
+                            AI POWERED CREATIVE WORKSPACE
+                        </div>
+
+                        <h1>
+                            Turn ideas into
+                            <span>something remarkable.</span>
+                        </h1>
+
+                        <p>
+                            Think. Create. Design. Launch.
+                            Your AI-powered creative workspace for ideas,
+                            marketing and design.
+                        </p>
+
+                    </div>
+
+                </div>
+
+
+                <!-- QUICK ACTIONS -->
+                <div class="quick-section">
+
+                    <div class="quick-title">
+                        Start creating
+                    </div>
+
+                    <div class="quick-grid">
+
+                        <button
+                            class="quick-card"
+                            data-prompt="Give me 5 creative marketing campaign ideas for a modern startup."
+                        >
+                            <div class="quick-icon">✦</div>
+
+                            <div>
+                                <strong>Marketing Ideas</strong>
+                                <span>Generate campaign concepts</span>
+                            </div>
+
+                        </button>
+
+
+                        <button
+                            class="quick-card"
+                            data-prompt="Create a premium Instagram content strategy for a startup."
+                        >
+                            <div class="quick-icon">◎</div>
+
+                            <div>
+                                <strong>Social Media</strong>
+                                <span>Build content concepts</span>
+                            </div>
+
+                        </button>
+
+
+                        <button
+                            class="quick-card"
+                            data-prompt="Help me create a premium brand identity for a new startup."
+                        >
+                            <div class="quick-icon">◇</div>
+
+                            <div>
+                                <strong>Brand Identity</strong>
+                                <span>Build a visual direction</span>
+                            </div>
+
+                        </button>
+
+
+                        <button
+                            class="quick-card"
+                            data-prompt="Give me a modern landing page UI concept for a technology startup."
+                        >
+                            <div class="quick-icon">⌘</div>
+
+                            <div>
+                                <strong>UI Concept</strong>
+                                <span>Design digital experiences</span>
+                            </div>
+
+                        </button>
+
+                    </div>
+
+                </div>
+
+
+                <!-- CHAT AREA -->
+                <div class="chat-area" id="chatArea"></div>
+
+
+                <!-- COMPOSER -->
+                <div class="composer">
+
+                    <div class="composer-inner">
+
+                        <textarea
+                            id="messageInput"
+                            placeholder="Ask rast.ai anything..."
+                            rows="1"
+                        ></textarea>
+
+                        <button id="sendButton" class="send-button">
+                            <span>↑</span>
+                        </button>
+
+                    </div>
+
+                    <div class="composer-note">
+                        rast.ai can make mistakes. Check important information.
+                    </div>
+
+                </div>
+
+            </section>
+
+        </main>
+
+    </div>
+
+
+    <script src="script.js?v=3"></script>
 
 </body>
-
 </html>
