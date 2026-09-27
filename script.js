@@ -1,50 +1,75 @@
-// ==========================================
-// RAST.AI FRONTEND
-// ==========================================
+// =========================================================
+// RAST.AI V2
+// =========================================================
 
 
-// 🔴 IMPORTANT:
-// Replace this with your ACTUAL Render backend URL.
-//
-// Example:
-// https://rast-ai-xxxx.onrender.com
-//
-// DO NOT add /chat at the end.
-// DO NOT put your Gemini API key here.
+// =========================================================
+// BACKEND
+// =========================================================
 
 const BACKEND_URL =
     "https://rast-ai.onrender.com";
 
 
-// ==========================================
+// =========================================================
 // ELEMENTS
-// ==========================================
+// =========================================================
 
-const messageInput = document.getElementById("messageInput");
-const sendButton = document.getElementById("sendButton");
-const chatArea = document.getElementById("chatArea");
+const messageInput =
+    document.getElementById(
+        "messageInput"
+    );
 
-const chatMode = document.getElementById("chatMode");
-const designMode = document.getElementById("designMode");
+const sendButton =
+    document.getElementById(
+        "sendButton"
+    );
 
-const modeLabel = document.getElementById("modeLabel");
-const newChat = document.getElementById("newChat");
+const chatArea =
+    document.getElementById(
+        "chatArea"
+    );
+
+const chatMode =
+    document.getElementById(
+        "chatMode"
+    );
+
+const designMode =
+    document.getElementById(
+        "designMode"
+    );
+
+const modeLabel =
+    document.getElementById(
+        "modeLabel"
+    );
+
+const newChat =
+    document.getElementById(
+        "newChat"
+    );
 
 
-// ==========================================
+// =========================================================
 // STATE
-// ==========================================
+// =========================================================
 
 let currentMode = "chat";
 
+let conversation = [];
 
-// ==========================================
-// WELCOME SCREEN
-// ==========================================
+let chats = [];
+
+
+// =========================================================
+// WELCOME
+// =========================================================
 
 function showWelcome() {
 
     chatArea.innerHTML = `
+
         <div class="welcome-message">
 
             <div class="welcome-icon">
@@ -56,22 +81,72 @@ function showWelcome() {
             </h2>
 
             <p>
-                Ask me anything, brainstorm an idea,
-                or start building your next creative project.
+                Ask rast.ai anything,
+                brainstorm an idea,
+                or open Design Studio
+                and start creating.
             </p>
 
         </div>
+
     `;
 }
 
 
-// ==========================================
+// =========================================================
+// FORMAT TEXT
+// =========================================================
+
+function formatText(text) {
+
+    if (!text) {
+        return "";
+    }
+
+
+    return text
+
+        .replace(
+            /&/g,
+            "&amp;"
+        )
+
+        .replace(
+            /</g,
+            "&lt;"
+        )
+
+        .replace(
+            />/g,
+            "&gt;"
+        )
+
+        .replace(
+            /\*\*(.*?)\*\*/g,
+            "<strong>$1</strong>"
+        )
+
+        .replace(
+            /\n/g,
+            "<br>"
+        );
+}
+
+
+// =========================================================
 // ADD MESSAGE
-// ==========================================
+// =========================================================
 
-function addMessage(text, sender) {
+function addMessage(
+    text,
+    sender
+) {
 
-    const message = document.createElement("div");
+    const message =
+        document.createElement(
+            "div"
+        );
+
 
     message.className =
         sender === "user"
@@ -86,6 +161,7 @@ function addMessage(text, sender) {
 
 
     message.innerHTML = `
+
         <div class="message-label">
             ${label}
         </div>
@@ -93,68 +169,78 @@ function addMessage(text, sender) {
         <div class="message-content">
             ${formatText(text)}
         </div>
+
     `;
 
 
-    chatArea.appendChild(message);
+    chatArea.appendChild(
+        message
+    );
 
-    chatArea.scrollTop = chatArea.scrollHeight;
+
+    chatArea.scrollTop =
+        chatArea.scrollHeight;
 }
 
 
-// ==========================================
-// BASIC TEXT FORMATTER
-// ==========================================
-
-function formatText(text) {
-
-    if (!text) return "";
-
-    return text
-        .replace(/&/g, "&amp;")
-        .replace(/</g, "&lt;")
-        .replace(/>/g, "&gt;")
-        .replace(/\n/g, "<br>");
-}
-
-
-// ==========================================
-// LOADING MESSAGE
-// ==========================================
+// =========================================================
+// LOADING
+// =========================================================
 
 function showLoading() {
 
-    const loading = document.createElement("div");
+    const loading =
+        document.createElement(
+            "div"
+        );
 
-    loading.className = "message ai-message";
-    loading.id = "loadingMessage";
+
+    loading.className =
+        "message ai-message";
+
+
+    loading.id =
+        "loadingMessage";
+
 
     loading.innerHTML = `
+
         <div class="message-label">
             rast.ai
         </div>
 
         <div class="message-content loading">
+
             <span></span>
             <span></span>
             <span></span>
+
         </div>
+
     `;
 
-    chatArea.appendChild(loading);
 
-    chatArea.scrollTop = chatArea.scrollHeight;
+    chatArea.appendChild(
+        loading
+    );
+
+
+    chatArea.scrollTop =
+        chatArea.scrollHeight;
 }
 
 
-// ==========================================
+// =========================================================
 // REMOVE LOADING
-// ==========================================
+// =========================================================
 
 function removeLoading() {
 
     const loading =
-        document.getElementById("loadingMessage");
+        document.getElementById(
+            "loadingMessage"
+        );
+
 
     if (loading) {
         loading.remove();
@@ -162,11 +248,61 @@ function removeLoading() {
 }
 
 
-// ==========================================
-// SEND MESSAGE
-// ==========================================
+// =========================================================
+// SAVE CHAT
+// =========================================================
 
-async function sendMessage(customText = null) {
+function saveChat() {
+
+    if (
+        conversation.length === 0
+    ) {
+        return;
+    }
+
+
+    const firstUserMessage =
+        conversation.find(
+            item =>
+                item.role === "user"
+        );
+
+
+    const title =
+        firstUserMessage
+            ? firstUserMessage.text
+            : "New Chat";
+
+
+    chats.unshift({
+
+        title:
+            title.substring(
+                0,
+                35
+            ),
+
+        conversation:
+            [...conversation]
+
+    });
+
+
+    chats =
+        chats.slice(
+            0,
+            10
+        );
+}
+
+
+// =========================================================
+// SEND
+// =========================================================
+
+async function sendMessage(
+    customText = null
+) {
 
     const text =
         customText !== null
@@ -174,59 +310,93 @@ async function sendMessage(customText = null) {
             : messageInput.value.trim();
 
 
-    if (!text) return;
+    if (!text) {
+        return;
+    }
 
 
-    // Make sure the welcome screen disappears
     const welcome =
-        document.querySelector(".welcome-message");
+        document.querySelector(
+            ".welcome-message"
+        );
+
 
     if (welcome) {
         welcome.remove();
     }
 
 
-    // Show user's message
-    addMessage(text, "user");
+    addMessage(
+        text,
+        "user"
+    );
 
 
-    // Clear input
+    conversation.push({
+
+        role: "user",
+
+        text: text
+
+    });
+
+
     messageInput.value = "";
 
-    messageInput.style.height = "auto";
+    messageInput.style.height =
+        "auto";
 
 
-    // Show loading
     showLoading();
 
 
-    // Disable button
-    sendButton.disabled = true;
+    sendButton.disabled =
+        true;
 
 
     try {
 
-        const response = await fetch(
-            `${BACKEND_URL}/chat`,
-            {
-                method: "POST",
+        const response =
+            await fetch(
 
-                headers: {
-                    "Content-Type": "application/json"
-                },
+                `${BACKEND_URL}/chat`,
 
-                body: JSON.stringify({
+                {
 
-                    message: text,
+                    method:
+                        "POST",
 
-                    mode: currentMode
+                    headers: {
 
-                })
-            }
-        );
+                        "Content-Type":
+                            "application/json"
+
+                    },
+
+                    body:
+                        JSON.stringify({
+
+                            message:
+                                text,
+
+                            mode:
+                                currentMode,
+
+                            history:
+                                conversation
+                                    .slice(
+                                        0,
+                                        -1
+                                    )
+
+                        })
+
+                }
+            );
 
 
-        const data = await response.json();
+        const data =
+            await response.json();
 
 
         removeLoading();
@@ -235,28 +405,36 @@ async function sendMessage(customText = null) {
         if (!response.ok) {
 
             throw new Error(
+
                 data.error ||
-                "The server returned an error."
+                "Server error."
+
             );
 
         }
 
 
-        if (data.reply) {
+        const reply =
+            data.reply ||
+            "I didn't receive a response.";
 
-            addMessage(
-                data.reply,
-                "ai"
-            );
 
-        } else {
+        addMessage(
+            reply,
+            "ai"
+        );
 
-            addMessage(
-                "I didn't receive a response from the AI.",
-                "ai"
-            );
 
-        }
+        conversation.push({
+
+            role: "model",
+
+            text: reply
+
+        });
+
+
+        saveChat();
 
 
     } catch (error) {
@@ -271,34 +449,53 @@ async function sendMessage(customText = null) {
 
 
         addMessage(
+
             "Sorry, something went wrong. Please try again.",
+
             "ai"
+
         );
 
     }
 
 
-    sendButton.disabled = false;
+    sendButton.disabled =
+        false;
+
 
     messageInput.focus();
 }
 
 
-// ==========================================
-// CHAT MODE
-// ==========================================
+// =========================================================
+// MODE
+// =========================================================
 
-function setMode(mode) {
+function setMode(
+    mode
+) {
 
-    currentMode = mode;
+    currentMode =
+        mode;
 
 
-    if (mode === "chat") {
+    if (
+        mode === "chat"
+    ) {
 
-        chatMode.classList.add("active");
-        designMode.classList.remove("active");
+        chatMode
+            .classList
+            .add("active");
 
-        modeLabel.textContent = "AI Chat";
+
+        designMode
+            .classList
+            .remove("active");
+
+
+        modeLabel.textContent =
+            "AI Chat";
+
 
         messageInput.placeholder =
             "Ask rast.ai anything...";
@@ -306,71 +503,99 @@ function setMode(mode) {
     }
 
 
-    if (mode === "design") {
+    if (
+        mode === "design"
+    ) {
 
-        designMode.classList.add("active");
-        chatMode.classList.remove("active");
+        designMode
+            .classList
+            .add("active");
+
+
+        chatMode
+            .classList
+            .remove("active");
+
 
         modeLabel.textContent =
             "Design Studio";
+
 
         messageInput.placeholder =
             "Describe what you want to design...";
 
     }
-
 }
 
 
-// ==========================================
+// =========================================================
 // MODE BUTTONS
-// ==========================================
+// =========================================================
 
 chatMode.addEventListener(
+
     "click",
+
     () => {
 
-        setMode("chat");
+        setMode(
+            "chat"
+        );
 
     }
+
 );
 
 
 designMode.addEventListener(
+
     "click",
+
     () => {
 
-        setMode("design");
+        setMode(
+            "design"
+        );
 
     }
+
 );
 
 
-// ==========================================
+// =========================================================
 // SEND BUTTON
-// ==========================================
+// =========================================================
 
 sendButton.addEventListener(
+
     "click",
+
     () => {
 
         sendMessage();
 
     }
+
 );
 
 
-// ==========================================
-// ENTER TO SEND
-// ==========================================
+// =========================================================
+// ENTER
+// =========================================================
 
 messageInput.addEventListener(
+
     "keydown",
-    (event) => {
+
+    event => {
 
         if (
-            event.key === "Enter" &&
+
+            event.key ===
+                "Enter" &&
+
             !event.shiftKey
+
         ) {
 
             event.preventDefault();
@@ -380,56 +605,78 @@ messageInput.addEventListener(
         }
 
     }
+
 );
 
 
-// ==========================================
-// AUTO-GROW TEXTAREA
-// ==========================================
+// =========================================================
+// AUTO RESIZE
+// =========================================================
 
 messageInput.addEventListener(
+
     "input",
+
     () => {
 
         messageInput.style.height =
             "auto";
 
+
         messageInput.style.height =
+
             Math.min(
-                messageInput.scrollHeight,
+
+                messageInput
+                    .scrollHeight,
+
                 160
+
             ) + "px";
 
     }
+
 );
 
 
-// ==========================================
+// =========================================================
 // NEW CHAT
-// ==========================================
+// =========================================================
 
 newChat.addEventListener(
+
     "click",
+
     () => {
 
-        chatArea.innerHTML = "";
+        saveChat();
 
-        messageInput.value = "";
 
-        messageInput.style.height =
-            "auto";
+        conversation =
+            [];
+
+
+        chatArea.innerHTML =
+            "";
+
+
+        messageInput.value =
+            "";
+
 
         showWelcome();
+
 
         messageInput.focus();
 
     }
+
 );
 
 
-// ==========================================
+// =========================================================
 // QUICK ACTIONS
-// ==========================================
+// =========================================================
 
 const quickButtons =
     document.querySelectorAll(
@@ -438,10 +685,13 @@ const quickButtons =
 
 
 quickButtons.forEach(
-    (button) => {
+
+    button => {
 
         button.addEventListener(
+
             "click",
+
             () => {
 
                 const prompt =
@@ -449,21 +699,28 @@ quickButtons.forEach(
                         "data-prompt"
                     );
 
-                sendMessage(prompt);
+
+                sendMessage(
+                    prompt
+                );
 
             }
+
         );
 
     }
+
 );
 
 
-// ==========================================
-// INITIALIZE
-// ==========================================
+// =========================================================
+// START
+// =========================================================
 
 showWelcome();
 
-setMode("chat");
+setMode(
+    "chat"
+);
 
 messageInput.focus();
