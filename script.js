@@ -1,19 +1,11 @@
 // =========================================================
-// RAST.AI V2
+// RAST.AI — MAIN JAVASCRIPT
 // =========================================================
 
-
-// =========================================================
-// BACKEND URL
-// =========================================================
-
-// PUT YOUR EXISTING RENDER URL HERE.
-//
-// Example:
-// https://rast-ai-xxxx.onrender.com
-//
-// DO NOT add /chat
-// DO NOT put your Gemini API key here.
+// IMPORTANT:
+// Put your EXISTING Render backend URL here.
+// Do NOT add /chat or /generate-image.
+// Do NOT put your Gemini or Hugging Face API key here.
 
 const BACKEND_URL =
     "https://rast-ai.onrender.com";
@@ -24,39 +16,33 @@ const BACKEND_URL =
 // =========================================================
 
 const messageInput =
-    document.getElementById(
-        "messageInput"
-    );
+    document.getElementById("messageInput");
 
 const sendButton =
-    document.getElementById(
-        "sendButton"
-    );
+    document.getElementById("sendButton");
 
 const chatArea =
-    document.getElementById(
-        "chatArea"
-    );
+    document.getElementById("chatArea");
 
 const chatMode =
-    document.getElementById(
-        "chatMode"
-    );
+    document.getElementById("chatMode");
 
 const designMode =
-    document.getElementById(
-        "designMode"
-    );
+    document.getElementById("designMode");
 
 const modeLabel =
-    document.getElementById(
-        "modeLabel"
-    );
+    document.getElementById("modeLabel");
 
 const newChat =
-    document.getElementById(
-        "newChat"
-    );
+    document.getElementById("newChat");
+
+
+// Image generator elements
+const imagePrompt =
+    document.getElementById("imagePrompt");
+
+const generateImageButton =
+    document.getElementById("generateImageButton");
 
 
 // =========================================================
@@ -67,17 +53,14 @@ let currentMode = "chat";
 
 let conversation = [];
 
-let chats = [];
-
 
 // =========================================================
-// WELCOME
+// WELCOME MESSAGE
 // =========================================================
 
 function showWelcome() {
 
     chatArea.innerHTML = `
-
         <div class="welcome-message">
 
             <div class="welcome-icon">
@@ -89,20 +72,17 @@ function showWelcome() {
             </h2>
 
             <p>
-                Ask rast.ai anything,
-                brainstorm an idea,
+                Ask rast.ai anything, brainstorm an idea,
                 or switch to Design Studio.
             </p>
 
         </div>
-
     `;
-
 }
 
 
 // =========================================================
-// TEXT FORMATTER
+// FORMAT AI TEXT
 // =========================================================
 
 function formatText(text) {
@@ -111,51 +91,26 @@ function formatText(text) {
         return "";
     }
 
-
     return text
-
-        .replace(
-            /&/g,
-            "&amp;"
-        )
-
-        .replace(
-            /</g,
-            "&lt;"
-        )
-
-        .replace(
-            />/g,
-            "&gt;"
-        )
-
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
         .replace(
             /\*\*(.*?)\*\*/g,
             "<strong>$1</strong>"
         )
-
-        .replace(
-            /\n/g,
-            "<br>"
-        );
-
+        .replace(/\n/g, "<br>");
 }
 
 
 // =========================================================
-// ADD MESSAGE
+// ADD CHAT MESSAGE
 // =========================================================
 
-function addMessage(
-    text,
-    sender
-) {
+function addMessage(text, sender) {
 
     const message =
-        document.createElement(
-            "div"
-        );
-
+        document.createElement("div");
 
     message.className =
         sender === "user"
@@ -170,7 +125,6 @@ function addMessage(
 
 
     message.innerHTML = `
-
         <div class="message-label">
             ${label}
         </div>
@@ -178,43 +132,33 @@ function addMessage(
         <div class="message-content">
             ${formatText(text)}
         </div>
-
     `;
 
 
-    chatArea.appendChild(
-        message
-    );
-
+    chatArea.appendChild(message);
 
     chatArea.scrollTop =
         chatArea.scrollHeight;
-
 }
 
 
 // =========================================================
-// LOADING
+// LOADING ANIMATION
 // =========================================================
 
 function showLoading() {
 
     const loading =
-        document.createElement(
-            "div"
-        );
-
+        document.createElement("div");
 
     loading.id =
         "loadingMessage";
-
 
     loading.className =
         "message ai-message";
 
 
     loading.innerHTML = `
-
         <div class="message-label">
             rast.ai
         </div>
@@ -226,24 +170,15 @@ function showLoading() {
             <span></span>
 
         </div>
-
     `;
 
 
-    chatArea.appendChild(
-        loading
-    );
-
+    chatArea.appendChild(loading);
 
     chatArea.scrollTop =
         chatArea.scrollHeight;
-
 }
 
-
-// =========================================================
-// REMOVE LOADING
-// =========================================================
 
 function removeLoading() {
 
@@ -252,22 +187,17 @@ function removeLoading() {
             "loadingMessage"
         );
 
-
     if (loading) {
         loading.remove();
     }
-
 }
 
 
 // =========================================================
-// SEND MESSAGE
+// SEND CHAT MESSAGE
 // =========================================================
 
-async function sendMessage(
-    customText = null
-) {
-
+async function sendMessage(customText = null) {
 
     const text =
         customText !== null
@@ -291,82 +221,53 @@ async function sendMessage(
     }
 
 
-    // Show user message
-
     addMessage(
         text,
         "user"
     );
 
 
-    // Save user message
-
     conversation.push({
-
         role: "user",
-
         text: text
-
     });
 
 
-    // Clear input
-
-    messageInput.value =
-        "";
+    messageInput.value = "";
 
     messageInput.style.height =
         "auto";
 
 
-    // Loading
-
     showLoading();
 
-
-    sendButton.disabled =
-        true;
+    sendButton.disabled = true;
 
 
     try {
 
-
         const response =
             await fetch(
-
                 `${BACKEND_URL}/chat`,
-
                 {
-
-                    method:
-                        "POST",
+                    method: "POST",
 
                     headers: {
-
                         "Content-Type":
                             "application/json"
-
                     },
 
-                    body:
-                        JSON.stringify({
+                    body: JSON.stringify({
 
-                            message:
-                                text,
+                        message: text,
 
-                            mode:
-                                currentMode,
+                        mode: currentMode,
 
-                            history:
-                                conversation.slice(
-                                    0,
-                                    -1
-                                )
+                        history:
+                            conversation.slice(0, -1)
 
-                        })
-
+                    })
                 }
-
             );
 
 
@@ -380,12 +281,9 @@ async function sendMessage(
         if (!response.ok) {
 
             throw new Error(
-
                 data.error ||
                 "Server error."
-
             );
-
         }
 
 
@@ -394,29 +292,19 @@ async function sendMessage(
             "I didn't receive a response.";
 
 
-        // Show AI response
-
         addMessage(
             reply,
             "ai"
         );
 
 
-        // Save AI response
-
         conversation.push({
-
             role: "model",
-
             text: reply
-
         });
 
 
-    }
-
-    catch (error) {
-
+    } catch (error) {
 
         console.error(
             "rast.ai error:",
@@ -428,50 +316,37 @@ async function sendMessage(
 
 
         addMessage(
-
             "Sorry, something went wrong. Please try again.",
-
             "ai"
-
         );
-
     }
 
 
-    sendButton.disabled =
-        false;
-
+    sendButton.disabled = false;
 
     messageInput.focus();
-
 }
 
 
 // =========================================================
-// MODE
+// SWITCH MODES
 // =========================================================
 
-function setMode(
-    mode
-) {
+function setMode(mode) {
 
     currentMode =
         mode;
 
 
-    if (
-        mode === "chat"
-    ) {
+    if (mode === "chat") {
 
+        chatMode.classList.add(
+            "active"
+        );
 
-        chatMode
-            .classList
-            .add("active");
-
-
-        designMode
-            .classList
-            .remove("active");
+        designMode.classList.remove(
+            "active"
+        );
 
 
         modeLabel.textContent =
@@ -480,24 +355,18 @@ function setMode(
 
         messageInput.placeholder =
             "Ask rast.ai anything...";
-
-
     }
 
 
-    if (
-        mode === "design"
-    ) {
+    if (mode === "design") {
 
+        designMode.classList.add(
+            "active"
+        );
 
-        designMode
-            .classList
-            .add("active");
-
-
-        chatMode
-            .classList
-            .remove("active");
+        chatMode.classList.remove(
+            "active"
+        );
 
 
         modeLabel.textContent =
@@ -506,9 +375,7 @@ function setMode(
 
         messageInput.placeholder =
             "Describe what you want to design...";
-
     }
-
 }
 
 
@@ -517,112 +384,66 @@ function setMode(
 // =========================================================
 
 chatMode.addEventListener(
-
     "click",
-
-    () => {
-
-        setMode(
-            "chat"
-        );
-
-    }
-
+    () => setMode("chat")
 );
 
 
 designMode.addEventListener(
-
     "click",
-
-    () => {
-
-        setMode(
-            "design"
-        );
-
-    }
-
+    () => setMode("design")
 );
 
 
 // =========================================================
-// SEND
+// SEND BUTTON
 // =========================================================
 
 sendButton.addEventListener(
-
     "click",
-
-    () => {
-
-        sendMessage();
-
-    }
-
+    () => sendMessage()
 );
 
 
 // =========================================================
-// ENTER
+// ENTER TO SEND
 // =========================================================
 
 messageInput.addEventListener(
-
     "keydown",
-
     event => {
 
-
         if (
-
-            event.key ===
-                "Enter" &&
-
+            event.key === "Enter" &&
             !event.shiftKey
-
         ) {
-
 
             event.preventDefault();
 
-
             sendMessage();
-
         }
-
     }
-
 );
 
 
 // =========================================================
-// AUTO RESIZE
+// AUTO-RESIZE TEXTAREA
 // =========================================================
 
 messageInput.addEventListener(
-
     "input",
-
     () => {
-
 
         messageInput.style.height =
             "auto";
 
 
         messageInput.style.height =
-
             Math.min(
-
                 messageInput.scrollHeight,
-
                 160
-
             ) + "px";
-
     }
-
 );
 
 
@@ -631,31 +452,19 @@ messageInput.addEventListener(
 // =========================================================
 
 newChat.addEventListener(
-
     "click",
-
     () => {
 
+        conversation = [];
 
-        conversation =
-            [];
+        chatArea.innerHTML = "";
 
-
-        chatArea.innerHTML =
-            "";
-
-
-        messageInput.value =
-            "";
-
+        messageInput.value = "";
 
         showWelcome();
 
-
         messageInput.focus();
-
     }
-
 );
 
 
@@ -670,16 +479,11 @@ const quickButtons =
 
 
 quickButtons.forEach(
-
     button => {
 
-
         button.addEventListener(
-
             "click",
-
             () => {
-
 
                 const prompt =
                     button.getAttribute(
@@ -687,27 +491,238 @@ quickButtons.forEach(
                     );
 
 
-                sendMessage(
-                    prompt
-                );
-
+                sendMessage(prompt);
             }
-
         );
-
     }
-
 );
 
 
 // =========================================================
-// START
+// IMAGE GENERATION
+// =========================================================
+
+async function generateImage(prompt) {
+
+    if (!prompt || !prompt.trim()) {
+
+        return;
+    }
+
+
+    const imagePromptText =
+        prompt.trim();
+
+
+    const welcome =
+        document.querySelector(
+            ".welcome-message"
+        );
+
+
+    if (welcome) {
+        welcome.remove();
+    }
+
+
+    addMessage(
+        `Creating your image...`,
+        "ai"
+    );
+
+
+    if (generateImageButton) {
+
+        generateImageButton.disabled =
+            true;
+
+        generateImageButton.textContent =
+            "Generating...";
+    }
+
+
+    try {
+
+        const response =
+            await fetch(
+                `${BACKEND_URL}/generate-image`,
+                {
+                    method: "POST",
+
+                    headers: {
+                        "Content-Type":
+                            "application/json"
+                    },
+
+                    body: JSON.stringify({
+                        prompt:
+                            imagePromptText
+                    })
+                }
+            );
+
+
+        const data =
+            await response.json();
+
+
+        if (
+            !response.ok ||
+            !data.success
+        ) {
+
+            throw new Error(
+                data.error ||
+                "Image generation failed."
+            );
+        }
+
+
+        // =============================================
+        // CREATE IMAGE MESSAGE
+        // =============================================
+
+        const imageMessage =
+            document.createElement("div");
+
+
+        imageMessage.className =
+            "message ai-message";
+
+
+        imageMessage.innerHTML = `
+
+            <div class="message-label">
+                rast.ai
+            </div>
+
+            <div class="message-content">
+
+                <p>
+                    Here's your generated image:
+                </p>
+
+                <img
+                    src="data:image/png;base64,${data.image}"
+                    alt="AI generated image"
+                    class="generated-image"
+                />
+
+                <div class="image-actions">
+
+                    <a
+                        href="data:image/png;base64,${data.image}"
+                        download="rast-ai-generated.png"
+                        class="image-download"
+                    >
+                        Download Image
+                    </a>
+
+                </div>
+
+            </div>
+        `;
+
+
+        chatArea.appendChild(
+            imageMessage
+        );
+
+
+        chatArea.scrollTop =
+            chatArea.scrollHeight;
+
+
+    } catch (error) {
+
+        console.error(
+            "Image generation error:",
+            error
+        );
+
+
+        addMessage(
+            "I couldn't generate that image. Please try again.",
+            "ai"
+        );
+    }
+
+
+    if (generateImageButton) {
+
+        generateImageButton.disabled =
+            false;
+
+        generateImageButton.textContent =
+            "✦ Generate Image";
+    }
+}
+
+
+// =========================================================
+// IMAGE GENERATOR BUTTON
+// =========================================================
+
+if (
+    imagePrompt &&
+    generateImageButton
+) {
+
+    generateImageButton.addEventListener(
+        "click",
+        () => {
+
+            const prompt =
+                imagePrompt.value.trim();
+
+
+            if (!prompt) {
+
+                imagePrompt.focus();
+
+                return;
+            }
+
+
+            generateImage(prompt);
+        }
+    );
+}
+
+
+// =========================================================
+// IMAGE PROMPT — CTRL/CMD + ENTER
+// =========================================================
+
+if (imagePrompt) {
+
+    imagePrompt.addEventListener(
+        "keydown",
+        event => {
+
+            if (
+                event.key === "Enter" &&
+                (event.ctrlKey ||
+                 event.metaKey)
+            ) {
+
+                event.preventDefault();
+
+                generateImage(
+                    imagePrompt.value
+                );
+            }
+        }
+    );
+}
+
+
+// =========================================================
+// STARTUP
 // =========================================================
 
 showWelcome();
 
-setMode(
-    "chat"
-);
+setMode("chat");
 
 messageInput.focus();
