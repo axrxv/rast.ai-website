@@ -4,8 +4,16 @@
 
 
 // =========================================================
-// BACKEND
+// BACKEND URL
 // =========================================================
+
+// PUT YOUR EXISTING RENDER URL HERE.
+//
+// Example:
+// https://rast-ai-xxxx.onrender.com
+//
+// DO NOT add /chat
+// DO NOT put your Gemini API key here.
 
 const BACKEND_URL =
     "https://rast-ai.onrender.com";
@@ -83,18 +91,18 @@ function showWelcome() {
             <p>
                 Ask rast.ai anything,
                 brainstorm an idea,
-                or open Design Studio
-                and start creating.
+                or switch to Design Studio.
             </p>
 
         </div>
 
     `;
+
 }
 
 
 // =========================================================
-// FORMAT TEXT
+// TEXT FORMATTER
 // =========================================================
 
 function formatText(text) {
@@ -130,6 +138,7 @@ function formatText(text) {
             /\n/g,
             "<br>"
         );
+
 }
 
 
@@ -180,6 +189,7 @@ function addMessage(
 
     chatArea.scrollTop =
         chatArea.scrollHeight;
+
 }
 
 
@@ -195,12 +205,12 @@ function showLoading() {
         );
 
 
-    loading.className =
-        "message ai-message";
-
-
     loading.id =
         "loadingMessage";
+
+
+    loading.className =
+        "message ai-message";
 
 
     loading.innerHTML = `
@@ -227,6 +237,7 @@ function showLoading() {
 
     chatArea.scrollTop =
         chatArea.scrollHeight;
+
 }
 
 
@@ -245,64 +256,18 @@ function removeLoading() {
     if (loading) {
         loading.remove();
     }
+
 }
 
 
 // =========================================================
-// SAVE CHAT
-// =========================================================
-
-function saveChat() {
-
-    if (
-        conversation.length === 0
-    ) {
-        return;
-    }
-
-
-    const firstUserMessage =
-        conversation.find(
-            item =>
-                item.role === "user"
-        );
-
-
-    const title =
-        firstUserMessage
-            ? firstUserMessage.text
-            : "New Chat";
-
-
-    chats.unshift({
-
-        title:
-            title.substring(
-                0,
-                35
-            ),
-
-        conversation:
-            [...conversation]
-
-    });
-
-
-    chats =
-        chats.slice(
-            0,
-            10
-        );
-}
-
-
-// =========================================================
-// SEND
+// SEND MESSAGE
 // =========================================================
 
 async function sendMessage(
     customText = null
 ) {
+
 
     const text =
         customText !== null
@@ -326,11 +291,15 @@ async function sendMessage(
     }
 
 
+    // Show user message
+
     addMessage(
         text,
         "user"
     );
 
+
+    // Save user message
 
     conversation.push({
 
@@ -341,11 +310,16 @@ async function sendMessage(
     });
 
 
-    messageInput.value = "";
+    // Clear input
+
+    messageInput.value =
+        "";
 
     messageInput.style.height =
         "auto";
 
+
+    // Loading
 
     showLoading();
 
@@ -355,6 +329,7 @@ async function sendMessage(
 
 
     try {
+
 
         const response =
             await fetch(
@@ -383,15 +358,15 @@ async function sendMessage(
                                 currentMode,
 
                             history:
-                                conversation
-                                    .slice(
-                                        0,
-                                        -1
-                                    )
+                                conversation.slice(
+                                    0,
+                                    -1
+                                )
 
                         })
 
                 }
+
             );
 
 
@@ -419,11 +394,15 @@ async function sendMessage(
             "I didn't receive a response.";
 
 
+        // Show AI response
+
         addMessage(
             reply,
             "ai"
         );
 
+
+        // Save AI response
 
         conversation.push({
 
@@ -434,10 +413,10 @@ async function sendMessage(
         });
 
 
-        saveChat();
+    }
 
+    catch (error) {
 
-    } catch (error) {
 
         console.error(
             "rast.ai error:",
@@ -464,6 +443,7 @@ async function sendMessage(
 
 
     messageInput.focus();
+
 }
 
 
@@ -483,6 +463,7 @@ function setMode(
         mode === "chat"
     ) {
 
+
         chatMode
             .classList
             .add("active");
@@ -500,12 +481,14 @@ function setMode(
         messageInput.placeholder =
             "Ask rast.ai anything...";
 
+
     }
 
 
     if (
         mode === "design"
     ) {
+
 
         designMode
             .classList
@@ -525,6 +508,7 @@ function setMode(
             "Describe what you want to design...";
 
     }
+
 }
 
 
@@ -563,7 +547,7 @@ designMode.addEventListener(
 
 
 // =========================================================
-// SEND BUTTON
+// SEND
 // =========================================================
 
 sendButton.addEventListener(
@@ -589,6 +573,7 @@ messageInput.addEventListener(
 
     event => {
 
+
         if (
 
             event.key ===
@@ -598,7 +583,9 @@ messageInput.addEventListener(
 
         ) {
 
+
             event.preventDefault();
+
 
             sendMessage();
 
@@ -619,6 +606,7 @@ messageInput.addEventListener(
 
     () => {
 
+
         messageInput.style.height =
             "auto";
 
@@ -627,8 +615,7 @@ messageInput.addEventListener(
 
             Math.min(
 
-                messageInput
-                    .scrollHeight,
+                messageInput.scrollHeight,
 
                 160
 
@@ -648,8 +635,6 @@ newChat.addEventListener(
     "click",
 
     () => {
-
-        saveChat();
 
 
         conversation =
@@ -688,11 +673,13 @@ quickButtons.forEach(
 
     button => {
 
+
         button.addEventListener(
 
             "click",
 
             () => {
+
 
                 const prompt =
                     button.getAttribute(
