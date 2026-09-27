@@ -13,7 +13,7 @@
 // DO NOT put your Gemini API key here.
 
 const BACKEND_URL =
-    "YOUR_EXISTING_RENDER_URL_HERE";
+    "https://rast-ai.onrender.com";
 
 
 // ==========================================
