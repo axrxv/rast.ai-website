@@ -35,7 +35,7 @@ const pageTitle =
 */
 
 const BACKEND_URL =
-    "YOUR_EXISTING_RENDER_URL_HERE";
+    "https://rast-ai.onrender.com";
 
 
 let currentMode = "chat";
