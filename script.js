@@ -1,407 +1,263 @@
-/* =========================================
-   RAST.AI FRONTEND
-   ========================================= */
-
-const GEMINI_API_KEY = "AQ.Ab8RN6I92UFna8E1Dkr9t7dbFD9mhucD4pwgIfvZOkOza_4VGQ";
-
-const messages =
-    document.getElementById("messages");
-
-const input =
-    document.getElementById("messageInput");
-
-const sendButton =
-    document.getElementById("sendButton");
-
-const newChatButton =
-    document.getElementById("newChat");
-
-const chatModeButton =
-    document.getElementById("chatModeButton");
-
-const designModeButton =
-    document.getElementById("designModeButton");
-
-const modeLabel =
-    document.getElementById("modeLabel");
-
-const pageTitle =
-    document.getElementById("pageTitle");
+// ==========================================
+// RAST.AI FRONTEND
+// ==========================================
 
 
-let currentMode =
-    "chat";
+// 🔴 IMPORTANT:
+// Replace this with your ACTUAL Render backend URL.
+//
+// Example:
+// https://rast-ai-xxxx.onrender.com
+//
+// DO NOT add /chat at the end.
+// DO NOT put your Gemini API key here.
+
+const BACKEND_URL =
+    "YOUR_EXISTING_RENDER_URL_HERE";
 
 
-/* =========================================
-   ADD MESSAGE
-   ========================================= */
+// ==========================================
+// ELEMENTS
+// ==========================================
 
-function addMessage(
-    text,
-    type
-) {
+const messageInput = document.getElementById("messageInput");
+const sendButton = document.getElementById("sendButton");
+const chatArea = document.getElementById("chatArea");
 
-    const message =
-        document.createElement("div");
+const chatMode = document.getElementById("chatMode");
+const designMode = document.getElementById("designMode");
 
-    message.className =
-        `message ${type}`;
-
-    message.textContent =
-        text;
-
-    messages.appendChild(
-        message
-    );
-
-    messages.scrollTop =
-        messages.scrollHeight;
-
-    return message;
-
-}
+const modeLabel = document.getElementById("modeLabel");
+const newChat = document.getElementById("newChat");
 
 
-/* =========================================
-   HERO
-   ========================================= */
+// ==========================================
+// STATE
+// ==========================================
+
+let currentMode = "chat";
+
+
+// ==========================================
+// WELCOME SCREEN
+// ==========================================
 
 function showWelcome() {
 
-    messages.innerHTML = `
+    chatArea.innerHTML = `
+        <div class="welcome-message">
 
-        <div class="hero">
-
-            <div class="hero-image"></div>
-
-            <div class="hero-overlay"></div>
-
-            <div class="hero-content">
-
-                <div class="hero-pill">
-
-                    <span class="pill-dot"></span>
-
-                    ${
-                        currentMode === "design"
-                        ? "DESIGN STUDIO"
-                        : "AI + DESIGN"
-                    }
-
-                </div>
-
-
-                <h1>
-
-                    ${
-                        currentMode === "design"
-
-                        ? `Turn ideas into<br>
-                           <span>something visual.</span>`
-
-                        : `Turn ideas into<br>
-                           <span>something remarkable.</span>`
-                    }
-
-                </h1>
-
-
-                <p>
-
-                    ${
-                        currentMode === "design"
-
-                        ? `Create campaign concepts,
-                           brand systems, social creatives,
-                           UI directions and production-ready
-                           design briefs.`
-
-                        : `Chat, brainstorm, create campaigns,
-                           build brands and transform ideas
-                           into clear, creative concepts.`
-                    }
-
-                </p>
-
-
-                <div class="quick-actions">
-
-
-                    <button
-                        class="quick-card"
-                        data-prompt="Create a premium vertical marketing creative layout excluding human images. Focus on typography, graphic hierarchy, layout, color palette, and compelling copy."
-                    >
-
-                        <div class="quick-icon">
-                            ↗
-                        </div>
-
-                        <div>
-
-                            <strong>
-                                Creative Design
-                            </strong>
-
-                            <small>
-                                Layout & Direction
-                            </small>
-
-                        </div>
-
-                    </button>
-
-
-
-                    <button
-                        class="quick-card"
-                        data-prompt="Create a high-end advertising creative concept. Give me the complete visual concept, headline, supporting copy, layout, colors, typography and CTA."
-                    >
-
-                        <div class="quick-icon">
-                            ◉
-                        </div>
-
-                        <div>
-
-                            <strong>
-                                Ad Creative
-                            </strong>
-
-                            <small>
-                                Campaign concept
-                            </small>
-
-                        </div>
-
-                    </button>
-
-
-
-                    <button
-                        class="quick-card"
-                        data-prompt="Create a complete modern brand identity direction for a startup. Include brand personality, logo direction, colors, typography, imagery and visual language."
-                    >
-
-                        <div class="quick-icon">
-                            ◆
-                        </div>
-
-                        <div>
-
-                            <strong>
-                                Branding
-                            </strong>
-
-                            <small>
-                                Identity direction
-                            </small>
-
-                        </div>
-
-                    </button>
-
-
-
-                    <button
-                        class="quick-card"
-                        data-prompt="Create a premium landing page UI concept for an AI startup. Describe the sections, hierarchy, typography, colors, components and user experience."
-                    >
-
-                        <div class="quick-icon">
-                            □
-                        </div>
-
-                        <div>
-
-                            <strong>
-                                UI / UX
-                            </strong>
-
-                            <small>
-                                Product design
-                            </small>
-
-                        </div>
-
-                    </button>
-
-
-                </div>
-
+            <div class="welcome-icon">
+                ✦
             </div>
 
+            <h2>
+                What are we creating today?
+            </h2>
+
+            <p>
+                Ask me anything, brainstorm an idea,
+                or start building your next creative project.
+            </p>
+
+        </div>
+    `;
+}
+
+
+// ==========================================
+// ADD MESSAGE
+// ==========================================
+
+function addMessage(text, sender) {
+
+    const message = document.createElement("div");
+
+    message.className =
+        sender === "user"
+            ? "message user-message"
+            : "message ai-message";
+
+
+    const label =
+        sender === "user"
+            ? "You"
+            : "rast.ai";
+
+
+    message.innerHTML = `
+        <div class="message-label">
+            ${label}
         </div>
 
+        <div class="message-content">
+            ${formatText(text)}
+        </div>
     `;
 
 
-    attachQuickButtons();
+    chatArea.appendChild(message);
 
+    chatArea.scrollTop = chatArea.scrollHeight;
 }
 
 
-/* =========================================
-   MODE
-   ========================================= */
+// ==========================================
+// BASIC TEXT FORMATTER
+// ==========================================
 
-function setMode(
-    mode
-) {
+function formatText(text) {
 
-    currentMode =
-        mode;
+    if (!text) return "";
 
-
-    if (
-        mode === "design"
-    ) {
-
-        designModeButton
-            .classList
-            .add("active");
-
-        chatModeButton
-            .classList
-            .remove("active");
-
-        modeLabel.textContent =
-            "DESIGN STUDIO";
-
-        pageTitle.textContent =
-            "Design Studio";
-
-        input.placeholder =
-            "Describe the design you want...";
-
-        document.body
-            .classList
-            .add("design-mode");
+    return text
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/\n/g, "<br>");
+}
 
 
-    } else {
+// ==========================================
+// LOADING MESSAGE
+// ==========================================
 
-        chatModeButton
-            .classList
-            .add("active");
+function showLoading() {
 
-        designModeButton
-            .classList
-            .remove("active");
+    const loading = document.createElement("div");
 
-        modeLabel.textContent =
-            "CHAT";
+    loading.className = "message ai-message";
+    loading.id = "loadingMessage";
 
-        pageTitle.textContent =
-            "rast.ai";
+    loading.innerHTML = `
+        <div class="message-label">
+            rast.ai
+        </div>
 
-        input.placeholder =
-            "Ask rast.ai anything...";
+        <div class="message-content loading">
+            <span></span>
+            <span></span>
+            <span></span>
+        </div>
+    `;
 
-        document.body
-            .classList
-            .remove("design-mode");
+    chatArea.appendChild(loading);
 
+    chatArea.scrollTop = chatArea.scrollHeight;
+}
+
+
+// ==========================================
+// REMOVE LOADING
+// ==========================================
+
+function removeLoading() {
+
+    const loading =
+        document.getElementById("loadingMessage");
+
+    if (loading) {
+        loading.remove();
     }
-
-
-    showWelcome();
-
 }
 
 
-/* =========================================
-   SEND MESSAGE
-   ========================================= */
+// ==========================================
+// SEND MESSAGE
+// ==========================================
 
-async function sendMessage(
-    customText = null
-) {
+async function sendMessage(customText = null) {
 
     const text =
-        customText ||
-        input.value.trim();
+        customText !== null
+            ? customText.trim()
+            : messageInput.value.trim();
 
 
-    if (!text) {
+    if (!text) return;
 
-        return;
 
+    // Make sure the welcome screen disappears
+    const welcome =
+        document.querySelector(".welcome-message");
+
+    if (welcome) {
+        welcome.remove();
     }
 
 
-    const hero =
-        document.querySelector(".hero");
+    // Show user's message
+    addMessage(text, "user");
 
 
-    if (hero) {
+    // Clear input
+    messageInput.value = "";
 
-        hero.remove();
-
-    }
-
-
-    addMessage(
-        text,
-        "user-message"
-    );
+    messageInput.style.height = "auto";
 
 
-    input.value =
-        "";
-
-    input.style.height =
-        "auto";
+    // Show loading
+    showLoading();
 
 
-    const thinking =
-        addMessage(
-            currentMode === "design"
-                ? "Creating your design concept..."
-                : "Thinking...",
-            "bot-message"
-        );
-
-
-    sendButton.disabled =
-        true;
+    // Disable button
+    sendButton.disabled = true;
 
 
     try {
 
-        const systemPrompt = currentMode === "design"
-            ? "You are rast.ai Design Studio, an expert graphic designer and brand strategist. Generate high-quality visual concepts, vertical graphic layouts, color palettes, typography specs, and creative briefs. Avoid including real-life people in design descriptions unless explicitly requested."
-            : "You are rast.ai, an AI & Design Assistant. Provide concise, helpful, and creative responses.";
-
         const response = await fetch(
-            `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${GEMINI_API_KEY}`,
+            `${BACKEND_URL}/chat`,
             {
                 method: "POST",
+
                 headers: {
                     "Content-Type": "application/json"
                 },
+
                 body: JSON.stringify({
-                    contents: [
-                        {
-                            parts: [
-                                { text: `${systemPrompt}\n\nUser request: ${text}` }
-                            ]
-                        }
-                    ]
+
+                    message: text,
+
+                    mode: currentMode
+
                 })
             }
         );
 
+
         const data = await response.json();
 
+
+        removeLoading();
+
+
         if (!response.ok) {
+
             throw new Error(
-                data.error?.message || "Gemini API request failed."
+                data.error ||
+                "The server returned an error."
             );
+
         }
 
-        const reply = data.candidates[0].content.parts[0].text;
-        thinking.textContent = reply;
+
+        if (data.reply) {
+
+            addMessage(
+                data.reply,
+                "ai"
+            );
+
+        } else {
+
+            addMessage(
+                "I didn't receive a response from the AI.",
+                "ai"
+            );
+
+        }
+
 
     } catch (error) {
 
@@ -410,54 +266,89 @@ async function sendMessage(
             error
         );
 
-        thinking.textContent =
-            "Sorry, something went wrong. Please check your API key and try again.";
 
-    } finally {
+        removeLoading();
 
-        sendButton.disabled =
-            false;
 
-        input.focus();
+        addMessage(
+            "Sorry, something went wrong. Please try again.",
+            "ai"
+        );
+
+    }
+
+
+    sendButton.disabled = false;
+
+    messageInput.focus();
+}
+
+
+// ==========================================
+// CHAT MODE
+// ==========================================
+
+function setMode(mode) {
+
+    currentMode = mode;
+
+
+    if (mode === "chat") {
+
+        chatMode.classList.add("active");
+        designMode.classList.remove("active");
+
+        modeLabel.textContent = "AI Chat";
+
+        messageInput.placeholder =
+            "Ask rast.ai anything...";
+
+    }
+
+
+    if (mode === "design") {
+
+        designMode.classList.add("active");
+        chatMode.classList.remove("active");
+
+        modeLabel.textContent =
+            "Design Studio";
+
+        messageInput.placeholder =
+            "Describe what you want to design...";
 
     }
 
 }
 
 
-/* =========================================
-   QUICK ACTIONS
-   ========================================= */
+// ==========================================
+// MODE BUTTONS
+// ==========================================
 
-function attachQuickButtons() {
+chatMode.addEventListener(
+    "click",
+    () => {
 
-    document
-        .querySelectorAll(
-            "[data-prompt]"
-        )
-        .forEach(
-            button => {
+        setMode("chat");
 
-                button.addEventListener(
-                    "click",
-                    () => {
-
-                        sendMessage(
-                            button.dataset.prompt
-                        );
-
-                    }
-                );
-
-            }
-        );
-
-}
+    }
+);
 
 
-/* =========================================
-   SEND BUTTON
-   ========================================= */
+designMode.addEventListener(
+    "click",
+    () => {
+
+        setMode("design");
+
+    }
+);
+
+
+// ==========================================
+// SEND BUTTON
+// ==========================================
 
 sendButton.addEventListener(
     "click",
@@ -469,13 +360,13 @@ sendButton.addEventListener(
 );
 
 
-/* =========================================
-   ENTER TO SEND
-   ========================================= */
+// ==========================================
+// ENTER TO SEND
+// ==========================================
 
-input.addEventListener(
+messageInput.addEventListener(
     "keydown",
-    event => {
+    (event) => {
 
         if (
             event.key === "Enter" &&
@@ -492,75 +383,87 @@ input.addEventListener(
 );
 
 
-/* =========================================
-   TEXTAREA AUTO-GROW
-   ========================================= */
+// ==========================================
+// AUTO-GROW TEXTAREA
+// ==========================================
 
-input.addEventListener(
+messageInput.addEventListener(
     "input",
-    function() {
+    () => {
 
-        this.style.height =
+        messageInput.style.height =
             "auto";
 
-        this.style.height =
+        messageInput.style.height =
             Math.min(
-                this.scrollHeight,
-                130
+                messageInput.scrollHeight,
+                160
             ) + "px";
 
     }
 );
 
 
-/* =========================================
-   NEW CHAT
-   ========================================= */
+// ==========================================
+// NEW CHAT
+// ==========================================
 
-newChatButton.addEventListener(
+newChat.addEventListener(
     "click",
     () => {
+
+        chatArea.innerHTML = "";
+
+        messageInput.value = "";
+
+        messageInput.style.height =
+            "auto";
 
         showWelcome();
 
-        input.value =
-            "";
-
-        input.style.height =
-            "auto";
-
-        input.focus();
+        messageInput.focus();
 
     }
 );
 
 
-/* =========================================
-   MODE BUTTONS
-   ========================================= */
+// ==========================================
+// QUICK ACTIONS
+// ==========================================
 
-chatModeButton.addEventListener(
-    "click",
-    () => {
+const quickButtons =
+    document.querySelectorAll(
+        "[data-prompt]"
+    );
 
-        setMode("chat");
+
+quickButtons.forEach(
+    (button) => {
+
+        button.addEventListener(
+            "click",
+            () => {
+
+                const prompt =
+                    button.getAttribute(
+                        "data-prompt"
+                    );
+
+                sendMessage(prompt);
+
+            }
+        );
 
     }
 );
 
 
-designModeButton.addEventListener(
-    "click",
-    () => {
-
-        setMode("design");
-
-    }
-);
-
-
-/* =========================================
-   START
-   ========================================= */
+// ==========================================
+// INITIALIZE
+// ==========================================
 
 showWelcome();
+
+setMode("chat");
+
+messageInput.focus();
