@@ -45,7 +45,7 @@ DO NOT PUT YOUR GEMINI API KEY HERE
 
 
 const BACKEND_URL =
-    "YOUR_EXISTING_RENDER_URL_HERE";
+    "https://rast-ai.onrender.com";
 
 
 let currentMode =
