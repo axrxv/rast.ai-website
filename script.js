@@ -5,7 +5,7 @@
 // IMPORTANT:
 // Put your EXISTING Render backend URL here.
 // Do NOT add /chat or /generate-image.
-// Do NOT put your Gemini or Hugging Face API key here.
+// Do NOT put your Gemini API key here.
 
 const BACKEND_URL =
     "https://rast-ai.onrender.com";
@@ -35,7 +35,6 @@ const modeLabel =
 
 const newChat =
     document.getElementById("newChat");
-
 
 // Image generator elements
 const imagePrompt =
@@ -117,12 +116,10 @@ function addMessage(text, sender) {
             ? "message user-message"
             : "message ai-message";
 
-
     const label =
         sender === "user"
             ? "You"
             : "rast.ai";
-
 
     message.innerHTML = `
         <div class="message-label">
@@ -133,7 +130,6 @@ function addMessage(text, sender) {
             ${formatText(text)}
         </div>
     `;
-
 
     chatArea.appendChild(message);
 
@@ -157,7 +153,6 @@ function showLoading() {
     loading.className =
         "message ai-message";
 
-
     loading.innerHTML = `
         <div class="message-label">
             rast.ai
@@ -171,7 +166,6 @@ function showLoading() {
 
         </div>
     `;
-
 
     chatArea.appendChild(loading);
 
@@ -204,44 +198,48 @@ async function sendMessage(customText = null) {
             ? customText.trim()
             : messageInput.value.trim();
 
-
     if (!text) {
         return;
     }
 
 
+    // Remove welcome screen
     const welcome =
         document.querySelector(
             ".welcome-message"
         );
-
 
     if (welcome) {
         welcome.remove();
     }
 
 
+    // Show user message
     addMessage(
         text,
         "user"
     );
 
 
+    // Save conversation
     conversation.push({
         role: "user",
         text: text
     });
 
 
+    // Clear input
     messageInput.value = "";
 
     messageInput.style.height =
         "auto";
 
 
+    // Loading
     showLoading();
 
-    sendButton.disabled = true;
+    sendButton.disabled =
+        true;
 
 
     try {
@@ -259,9 +257,11 @@ async function sendMessage(customText = null) {
 
                     body: JSON.stringify({
 
-                        message: text,
+                        message:
+                            text,
 
-                        mode: currentMode,
+                        mode:
+                            currentMode,
 
                         history:
                             conversation.slice(0, -1)
@@ -292,12 +292,14 @@ async function sendMessage(customText = null) {
             "I didn't receive a response.";
 
 
+        // Show AI response
         addMessage(
             reply,
             "ai"
         );
 
 
+        // Save AI response
         conversation.push({
             role: "model",
             text: reply
@@ -319,10 +321,12 @@ async function sendMessage(customText = null) {
             "Sorry, something went wrong. Please try again.",
             "ai"
         );
+
     }
 
 
-    sendButton.disabled = false;
+    sendButton.disabled =
+        false;
 
     messageInput.focus();
 }
@@ -348,10 +352,8 @@ function setMode(mode) {
             "active"
         );
 
-
         modeLabel.textContent =
             "AI Chat";
-
 
         messageInput.placeholder =
             "Ask rast.ai anything...";
@@ -368,10 +370,8 @@ function setMode(mode) {
             "active"
         );
 
-
         modeLabel.textContent =
             "Design Studio";
-
 
         messageInput.placeholder =
             "Describe what you want to design...";
@@ -387,7 +387,6 @@ chatMode.addEventListener(
     "click",
     () => setMode("chat")
 );
-
 
 designMode.addEventListener(
     "click",
@@ -436,7 +435,6 @@ messageInput.addEventListener(
 
         messageInput.style.height =
             "auto";
-
 
         messageInput.style.height =
             Math.min(
@@ -490,8 +488,9 @@ quickButtons.forEach(
                         "data-prompt"
                     );
 
-
-                sendMessage(prompt);
+                sendMessage(
+                    prompt
+                );
             }
         );
     }
@@ -499,13 +498,24 @@ quickButtons.forEach(
 
 
 // =========================================================
-// IMAGE GENERATION
+// DEMO IMAGE PREVIEW
+// =========================================================
+// Temporary demo mode.
+//
+// Put this file in the same folder as index.html:
+//
+// demo-image.png
+//
+// This does NOT call Hugging Face or Gemini image
+// generation. It displays your prepared demo image.
 // =========================================================
 
 async function generateImage(prompt) {
 
-    if (!prompt || !prompt.trim()) {
-
+    if (
+        !prompt ||
+        !prompt.trim()
+    ) {
         return;
     }
 
@@ -514,19 +524,20 @@ async function generateImage(prompt) {
         prompt.trim();
 
 
+    // Remove welcome message
     const welcome =
         document.querySelector(
             ".welcome-message"
         );
-
 
     if (welcome) {
         welcome.remove();
     }
 
 
+    // Show creating message
     addMessage(
-        `Creating your image...`,
+        "Preparing your design preview...",
         "ai"
     );
 
@@ -537,115 +548,86 @@ async function generateImage(prompt) {
             true;
 
         generateImageButton.textContent =
-            "Generating...";
+            "Preparing...";
     }
 
 
-    try {
-
-        const response =
-            await fetch(
-                `${BACKEND_URL}/generate-image`,
-                {
-                    method: "POST",
-
-                    headers: {
-                        "Content-Type":
-                            "application/json"
-                    },
-
-                    body: JSON.stringify({
-                        prompt:
-                            imagePromptText
-                    })
-                }
-            );
+    // Small delay for a smoother UI
+    await new Promise(
+        resolve =>
+            setTimeout(
+                resolve,
+                1200
+            )
+    );
 
 
-        const data =
-            await response.json();
+    // Create image result
+    const imageMessage =
+        document.createElement(
+            "div"
+        );
 
 
-        if (
-            !response.ok ||
-            !data.success
-        ) {
-
-            throw new Error(
-                data.error ||
-                "Image generation failed."
-            );
-        }
+    imageMessage.className =
+        "message ai-message";
 
 
-        // =============================================
-        // CREATE IMAGE MESSAGE
-        // =============================================
+    imageMessage.innerHTML = `
 
-        const imageMessage =
-            document.createElement("div");
+        <div class="message-label">
+            rast.ai
+        </div>
 
+        <div class="message-content">
 
-        imageMessage.className =
-            "message ai-message";
+            <p>
+                Design preview for:
+                <strong>
+                    ${formatText(imagePromptText)}
+                </strong>
+            </p>
 
+            <img
+                src="demo-image.png"
+                alt="rast.ai design preview"
+                class="generated-image"
+            />
 
-        imageMessage.innerHTML = `
+            <p
+                style="
+                    margin-top: 10px;
+                    font-size: 10px;
+                    color: #6f7688;
+                "
+            >
+                Demo preview — live image generation
+                is being integrated.
+            </p>
 
-            <div class="message-label">
-                rast.ai
+            <div class="image-actions">
+
+                <a
+                    href="demo-image.png"
+                    download="rast-ai-demo-image.png"
+                    class="image-download"
+                >
+                    Download Preview
+                </a>
+
             </div>
 
-            <div class="message-content">
-
-                <p>
-                    Here's your generated image:
-                </p>
-
-                <img
-                    src="data:image/png;base64,${data.image}"
-                    alt="AI generated image"
-                    class="generated-image"
-                />
-
-                <div class="image-actions">
-
-                    <a
-                        href="data:image/png;base64,${data.image}"
-                        download="rast-ai-generated.png"
-                        class="image-download"
-                    >
-                        Download Image
-                    </a>
-
-                </div>
-
-            </div>
-        `;
+        </div>
+    `;
 
 
-        chatArea.appendChild(
-            imageMessage
-        );
+    chatArea.appendChild(
+        imageMessage
+    );
 
 
-        chatArea.scrollTop =
-            chatArea.scrollHeight;
-
-
-    } catch (error) {
-
-        console.error(
-            "Image generation error:",
-            error
-        );
-
-
-        addMessage(
-            "I couldn't generate that image. Please try again.",
-            "ai"
-        );
-    }
+    chatArea.scrollTop =
+        chatArea.scrollHeight;
 
 
     if (generateImageButton) {
@@ -684,7 +666,9 @@ if (
             }
 
 
-            generateImage(prompt);
+            generateImage(
+                prompt
+            );
         }
     );
 }
@@ -702,8 +686,10 @@ if (imagePrompt) {
 
             if (
                 event.key === "Enter" &&
-                (event.ctrlKey ||
-                 event.metaKey)
+                (
+                    event.ctrlKey ||
+                    event.metaKey
+                )
             ) {
 
                 event.preventDefault();
