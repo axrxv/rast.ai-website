@@ -1,19 +1,31 @@
-// =========================================================
-// RAST.AI — MAIN JAVASCRIPT
-// =========================================================
+// ============================================================
+// rast.ai — FRONTEND JAVASCRIPT
+// ============================================================
 
-// IMPORTANT:
+
+// ------------------------------------------------------------
+// BACKEND
+// ------------------------------------------------------------
+
 // Put your EXISTING Render backend URL here.
-// Do NOT add /chat or /generate-image.
-// Do NOT put your Gemini API key here.
+// Example:
+// const BACKEND_URL = "https://rast-ai-xxxx.onrender.com";
 
-const BACKEND_URL =
-    "https://rast-ai.onrender.com";
+const BACKEND_URL = "https://rast-ai.onrender.com";
 
 
-// =========================================================
-// ELEMENTS
-// =========================================================
+// ------------------------------------------------------------
+// GLOBAL STATE
+// ------------------------------------------------------------
+
+let chatHistory = [];
+
+let currentMode = "chat";
+
+
+// ------------------------------------------------------------
+// DOM ELEMENTS
+// ------------------------------------------------------------
 
 const messageInput =
     document.getElementById("messageInput");
@@ -24,222 +36,340 @@ const sendButton =
 const chatArea =
     document.getElementById("chatArea");
 
-const chatMode =
-    document.getElementById("chatMode");
-
-const designMode =
-    document.getElementById("designMode");
-
-const modeLabel =
-    document.getElementById("modeLabel");
-
-const newChat =
-    document.getElementById("newChat");
-
-// Image generator elements
 const imagePrompt =
     document.getElementById("imagePrompt");
 
 const generateImageButton =
     document.getElementById("generateImageButton");
 
+const imageGenerator =
+    document.getElementById("imageGenerator");
 
-// =========================================================
-// STATE
-// =========================================================
+const heroSection =
+    document.getElementById("heroSection");
 
-let currentMode = "chat";
+const chatModeButton =
+    document.getElementById("chatModeButton");
 
-let conversation = [];
+const designModeButton =
+    document.getElementById("designModeButton");
 
+const imageToolButton =
+    document.getElementById("imageToolButton");
 
-// =========================================================
-// WELCOME MESSAGE
-// =========================================================
+const ideasToolButton =
+    document.getElementById("ideasToolButton");
 
-function showWelcome() {
-
-    chatArea.innerHTML = `
-        <div class="welcome-message">
-
-            <div class="welcome-icon">
-                ✦
-            </div>
-
-            <h2>
-                What are we creating today?
-            </h2>
-
-            <p>
-                Ask rast.ai anything, brainstorm an idea,
-                or switch to Design Studio.
-            </p>
-
-        </div>
-    `;
-}
+const pageTitle =
+    document.getElementById("pageTitle");
 
 
-// =========================================================
-// FORMAT AI TEXT
-// =========================================================
+// ------------------------------------------------------------
+// INITIAL SETUP
+// ------------------------------------------------------------
 
-function formatText(text) {
+document.addEventListener("DOMContentLoaded", () => {
 
-    if (!text) {
-        return "";
+    setupEventListeners();
+
+    setupQuickActions();
+
+    autoResizeTextarea();
+
+});
+
+
+// ------------------------------------------------------------
+// EVENT LISTENERS
+// ------------------------------------------------------------
+
+function setupEventListeners() {
+
+    // Send button
+    if (sendButton) {
+        sendButton.addEventListener("click", sendMessage);
     }
 
-    return text
-        .replace(/&/g, "&amp;")
-        .replace(/</g, "&lt;")
-        .replace(/>/g, "&gt;")
-        .replace(
-            /\*\*(.*?)\*\*/g,
-            "<strong>$1</strong>"
-        )
-        .replace(/\n/g, "<br>");
+
+    // Enter = send
+    if (messageInput) {
+
+        messageInput.addEventListener("keydown", (event) => {
+
+            if (
+                event.key === "Enter" &&
+                !event.shiftKey
+            ) {
+
+                event.preventDefault();
+
+                sendMessage();
+
+            }
+
+        });
+
+    }
+
+
+    // Auto resize chat textarea
+    if (messageInput) {
+
+        messageInput.addEventListener(
+            "input",
+            autoResizeTextarea
+        );
+
+    }
+
+
+    // Generate image
+    if (generateImageButton) {
+
+        generateImageButton.addEventListener(
+            "click",
+            generateImage
+        );
+
+    }
+
+
+    // Chat mode
+    if (chatModeButton) {
+
+        chatModeButton.addEventListener(
+            "click",
+            () => setMode("chat")
+        );
+
+    }
+
+
+    // Design mode
+    if (designModeButton) {
+
+        designModeButton.addEventListener(
+            "click",
+            () => setMode("design")
+        );
+
+    }
+
+
+    // Image tool
+    if (imageToolButton) {
+
+        imageToolButton.addEventListener(
+            "click",
+            () => {
+
+                setMode("design");
+
+                if (imageGenerator) {
+
+                    imageGenerator.scrollIntoView({
+                        behavior: "smooth"
+                    });
+
+                }
+
+            }
+        );
+
+    }
+
+
+    // Ideas tool
+    if (ideasToolButton) {
+
+        ideasToolButton.addEventListener(
+            "click",
+            () => {
+
+                setMode("chat");
+
+                if (messageInput) {
+
+                    messageInput.value =
+                        "Give me 10 creative marketing ideas for a modern startup.";
+
+                    messageInput.focus();
+
+                    autoResizeTextarea();
+
+                }
+
+            }
+        );
+
+    }
+
 }
 
 
-// =========================================================
-// ADD CHAT MESSAGE
-// =========================================================
+// ------------------------------------------------------------
+// MODE SWITCHING
+// ------------------------------------------------------------
 
-function addMessage(text, sender) {
+function setMode(mode) {
+
+    currentMode = mode;
+
+
+    // Remove active states
+    if (chatModeButton) {
+
+        chatModeButton.classList.remove("active");
+
+    }
+
+    if (designModeButton) {
+
+        designModeButton.classList.remove("active");
+
+    }
+
+
+    // Chat mode
+    if (mode === "chat") {
+
+        if (chatModeButton) {
+
+            chatModeButton.classList.add("active");
+
+        }
+
+        if (pageTitle) {
+
+            pageTitle.textContent = "AI Chat";
+
+        }
+
+    }
+
+
+    // Design mode
+    if (mode === "design") {
+
+        if (designModeButton) {
+
+            designModeButton.classList.add("active");
+
+        }
+
+        if (pageTitle) {
+
+            pageTitle.textContent =
+                "Design Studio";
+
+        }
+
+    }
+
+}
+
+
+// ------------------------------------------------------------
+// QUICK ACTIONS
+// ------------------------------------------------------------
+
+function setupQuickActions() {
+
+    const quickCards =
+        document.querySelectorAll(".quick-card");
+
+
+    quickCards.forEach((card) => {
+
+        card.addEventListener("click", () => {
+
+            const action =
+                card.dataset.action;
+
+            handleQuickAction(action);
+
+        });
+
+    });
+
+}
+
+
+function handleQuickAction(action) {
+
+    const prompts = {
+
+        campaign:
+            "Create a creative marketing campaign idea for a modern startup. Include the campaign concept, target audience, content ideas and a catchy tagline.",
+
+        social:
+            "Give me 10 creative social media content ideas for a modern startup. Make them engaging, original and suitable for Instagram.",
+
+        copy:
+            "Write 5 powerful marketing headlines and short promotional copy for a modern AI and design startup.",
+
+        ideas:
+            "Give me 10 unusual and creative ideas that could help an AI and design startup stand out."
+    };
+
+
+    const prompt =
+        prompts[action] ||
+        "Give me a creative idea.";
+
+
+    if (messageInput) {
+
+        messageInput.value = prompt;
+
+        autoResizeTextarea();
+
+        messageInput.focus();
+
+    }
+
+}
+
+
+// ------------------------------------------------------------
+// SEND CHAT MESSAGE
+// ------------------------------------------------------------
+
+async function sendMessage() {
+
+    if (!messageInput) return;
+
 
     const message =
-        document.createElement("div");
-
-    message.className =
-        sender === "user"
-            ? "message user-message"
-            : "message ai-message";
-
-    const label =
-        sender === "user"
-            ? "You"
-            : "rast.ai";
-
-    message.innerHTML = `
-        <div class="message-label">
-            ${label}
-        </div>
-
-        <div class="message-content">
-            ${formatText(text)}
-        </div>
-    `;
-
-    chatArea.appendChild(message);
-
-    chatArea.scrollTop =
-        chatArea.scrollHeight;
-}
+        messageInput.value.trim();
 
 
-// =========================================================
-// LOADING ANIMATION
-// =========================================================
-
-function showLoading() {
-
-    const loading =
-        document.createElement("div");
-
-    loading.id =
-        "loadingMessage";
-
-    loading.className =
-        "message ai-message";
-
-    loading.innerHTML = `
-        <div class="message-label">
-            rast.ai
-        </div>
-
-        <div class="message-content loading">
-
-            <span></span>
-            <span></span>
-            <span></span>
-
-        </div>
-    `;
-
-    chatArea.appendChild(loading);
-
-    chatArea.scrollTop =
-        chatArea.scrollHeight;
-}
-
-
-function removeLoading() {
-
-    const loading =
-        document.getElementById(
-            "loadingMessage"
-        );
-
-    if (loading) {
-        loading.remove();
-    }
-}
-
-
-// =========================================================
-// SEND CHAT MESSAGE
-// =========================================================
-
-async function sendMessage(customText = null) {
-
-    const text =
-        customText !== null
-            ? customText.trim()
-            : messageInput.value.trim();
-
-    if (!text) {
-        return;
-    }
-
-
-    // Remove welcome screen
-    const welcome =
-        document.querySelector(
-            ".welcome-message"
-        );
-
-    if (welcome) {
-        welcome.remove();
-    }
-
-
-    // Show user message
-    addMessage(
-        text,
-        "user"
-    );
-
-
-    // Save conversation
-    conversation.push({
-        role: "user",
-        text: text
-    });
+    if (!message) return;
 
 
     // Clear input
     messageInput.value = "";
 
-    messageInput.style.height =
-        "auto";
+    autoResizeTextarea();
 
 
-    // Loading
-    showLoading();
+    // Add user message
+    addMessage(
+        message,
+        "user"
+    );
 
-    sendButton.disabled =
-        true;
+
+    // Add to history
+    chatHistory.push({
+        role: "user",
+        content: message
+    });
+
+
+    // Loading message
+    const loadingId =
+        addLoadingMessage();
 
 
     try {
@@ -257,302 +387,273 @@ async function sendMessage(customText = null) {
 
                     body: JSON.stringify({
 
-                        message:
-                            text,
+                        message: message,
 
-                        mode:
-                            currentMode,
+                        history: chatHistory,
 
-                        history:
-                            conversation.slice(0, -1)
+                        mode: currentMode
 
                     })
+
                 }
             );
+
+
+        if (!response.ok) {
+
+            throw new Error(
+                `Server returned ${response.status}`
+            );
+
+        }
 
 
         const data =
             await response.json();
 
 
-        removeLoading();
-
-
-        if (!response.ok) {
-
-            throw new Error(
-                data.error ||
-                "Server error."
-            );
-        }
+        removeLoadingMessage(
+            loadingId
+        );
 
 
         const reply =
             data.reply ||
-            "I didn't receive a response.";
+            data.response ||
+            data.message ||
+            "I couldn't generate a response.";
 
 
-        // Show AI response
         addMessage(
             reply,
-            "ai"
+            "assistant"
         );
 
 
-        // Save AI response
-        conversation.push({
-            role: "model",
-            text: reply
+        chatHistory.push({
+
+            role: "assistant",
+
+            content: reply
+
         });
 
 
     } catch (error) {
 
         console.error(
-            "rast.ai error:",
+            "Chat error:",
             error
         );
 
 
-        removeLoading();
+        removeLoadingMessage(
+            loadingId
+        );
 
 
         addMessage(
-            "Sorry, something went wrong. Please try again.",
-            "ai"
+            "Sorry — I couldn't connect to the AI right now. Please check the backend connection.",
+            "assistant"
         );
 
     }
 
-
-    sendButton.disabled =
-        false;
-
-    messageInput.focus();
 }
 
 
-// =========================================================
-// SWITCH MODES
-// =========================================================
+// ------------------------------------------------------------
+// ADD MESSAGE
+// ------------------------------------------------------------
 
-function setMode(mode) {
+function addMessage(
+    text,
+    sender
+) {
 
-    currentMode =
-        mode;
-
-
-    if (mode === "chat") {
-
-        chatMode.classList.add(
-            "active"
-        );
-
-        designMode.classList.remove(
-            "active"
-        );
-
-        modeLabel.textContent =
-            "AI Chat";
-
-        messageInput.placeholder =
-            "Ask rast.ai anything...";
-    }
+    if (!chatArea) return;
 
 
-    if (mode === "design") {
-
-        designMode.classList.add(
-            "active"
-        );
-
-        chatMode.classList.remove(
-            "active"
-        );
-
-        modeLabel.textContent =
-            "Design Studio";
-
-        messageInput.placeholder =
-            "Describe what you want to design...";
-    }
-}
+    const messageElement =
+        document.createElement("div");
 
 
-// =========================================================
-// MODE BUTTONS
-// =========================================================
-
-chatMode.addEventListener(
-    "click",
-    () => setMode("chat")
-);
-
-designMode.addEventListener(
-    "click",
-    () => setMode("design")
-);
+    messageElement.className =
+        `message ${sender}`;
 
 
-// =========================================================
-// SEND BUTTON
-// =========================================================
-
-sendButton.addEventListener(
-    "click",
-    () => sendMessage()
-);
+    const bubble =
+        document.createElement("div");
 
 
-// =========================================================
-// ENTER TO SEND
-// =========================================================
-
-messageInput.addEventListener(
-    "keydown",
-    event => {
-
-        if (
-            event.key === "Enter" &&
-            !event.shiftKey
-        ) {
-
-            event.preventDefault();
-
-            sendMessage();
-        }
-    }
-);
+    bubble.className =
+        "message-bubble";
 
 
-// =========================================================
-// AUTO-RESIZE TEXTAREA
-// =========================================================
-
-messageInput.addEventListener(
-    "input",
-    () => {
-
-        messageInput.style.height =
-            "auto";
-
-        messageInput.style.height =
-            Math.min(
-                messageInput.scrollHeight,
-                160
-            ) + "px";
-    }
-);
+    // Convert basic line breaks
+    bubble.innerHTML =
+        formatText(text);
 
 
-// =========================================================
-// NEW CHAT
-// =========================================================
-
-newChat.addEventListener(
-    "click",
-    () => {
-
-        conversation = [];
-
-        chatArea.innerHTML = "";
-
-        messageInput.value = "";
-
-        showWelcome();
-
-        messageInput.focus();
-    }
-);
-
-
-// =========================================================
-// QUICK ACTIONS
-// =========================================================
-
-const quickButtons =
-    document.querySelectorAll(
-        "[data-prompt]"
+    messageElement.appendChild(
+        bubble
     );
 
 
-quickButtons.forEach(
-    button => {
+    chatArea.appendChild(
+        messageElement
+    );
 
-        button.addEventListener(
-            "click",
-            () => {
 
-                const prompt =
-                    button.getAttribute(
-                        "data-prompt"
-                    );
+    scrollChatToBottom();
 
-                sendMessage(
-                    prompt
-                );
-            }
+}
+
+
+// ------------------------------------------------------------
+// FORMAT TEXT
+// ------------------------------------------------------------
+
+function formatText(text) {
+
+    if (!text) return "";
+
+
+    return text
+        .replace(
+            /&/g,
+            "&amp;"
+        )
+        .replace(
+            /</g,
+            "&lt;"
+        )
+        .replace(
+            />/g,
+            "&gt;"
+        )
+        .replace(
+            /\n/g,
+            "<br>"
         );
+
+}
+
+
+// ------------------------------------------------------------
+// LOADING MESSAGE
+// ------------------------------------------------------------
+
+function addLoadingMessage() {
+
+    if (!chatArea) return null;
+
+
+    const id =
+        `loading-${Date.now()}`;
+
+
+    const element =
+        document.createElement("div");
+
+
+    element.className =
+        "message assistant";
+
+
+    element.id = id;
+
+
+    element.innerHTML = `
+
+        <div class="message-bubble loading-bubble">
+
+            <span class="loading-dot"></span>
+            <span class="loading-dot"></span>
+            <span class="loading-dot"></span>
+
+        </div>
+
+    `;
+
+
+    chatArea.appendChild(
+        element
+    );
+
+
+    scrollChatToBottom();
+
+
+    return id;
+
+}
+
+
+// ------------------------------------------------------------
+// REMOVE LOADING
+// ------------------------------------------------------------
+
+function removeLoadingMessage(id) {
+
+    if (!id) return;
+
+
+    const element =
+        document.getElementById(id);
+
+
+    if (element) {
+
+        element.remove();
+
     }
-);
+
+}
 
 
-// =========================================================
-// DEMO IMAGE PREVIEW
-// =========================================================
-// Temporary demo mode.
-//
-// Put this file in the same folder as index.html:
-//
-// demo-image.png
-//
-// This does NOT call Hugging Face or Gemini image
-// generation. It displays your prepared demo image.
-// =========================================================
+// ------------------------------------------------------------
+// IMAGE GENERATION DEMO
+// ------------------------------------------------------------
 
-async function generateImage(prompt) {
+async function generateImage() {
 
-    if (
-        !prompt ||
-        !prompt.trim()
-    ) {
+    if (!imagePrompt) return;
+
+
+    const prompt =
+        imagePrompt.value.trim();
+
+
+    if (!prompt) {
+
+        imagePrompt.focus();
+
         return;
+
     }
 
 
-    const imagePromptText =
-        prompt.trim();
-
-
-    // Remove welcome message
-    const welcome =
-        document.querySelector(
-            ".welcome-message"
-        );
-
-    if (welcome) {
-        welcome.remove();
-    }
-
-
-    // Show creating message
-    addMessage(
-        "Preparing your design preview...",
-        "ai"
-    );
-
-
+    // Disable button
     if (generateImageButton) {
 
         generateImageButton.disabled =
             true;
 
-        generateImageButton.textContent =
-            "Preparing...";
+        generateImageButton.innerHTML =
+            "✦ Preparing preview...";
+
     }
 
 
-    // Small delay for a smoother UI
+    // Show user request
+    addMessage(
+        `Create a design: ${prompt}`,
+        "user"
+    );
+
+
+    // Small delay to make the demo feel natural
     await new Promise(
         resolve =>
             setTimeout(
@@ -562,153 +663,126 @@ async function generateImage(prompt) {
     );
 
 
-    // Create image result
-    const imageMessage =
-        document.createElement(
-            "div"
-        );
+    // Add preview
+    addGeneratedImage();
 
 
-    imageMessage.className =
-        "message ai-message";
-
-
-    imageMessage.innerHTML = `
-
-        <div class="message-label">
-            rast.ai
-        </div>
-
-        <div class="message-content">
-
-            <p>
-                Design preview for:
-                <strong>
-                    ${formatText(imagePromptText)}
-                </strong>
-            </p>
-
-            <img
-                src="demo-image.png"
-                alt="rast.ai design preview"
-                class="generated-image"
-            />
-
-            <p
-                style="
-                    margin-top: 10px;
-                    font-size: 10px;
-                    color: #6f7688;
-                "
-            >
-                Demo preview — live image generation
-                is being integrated.
-            </p>
-
-            <div class="image-actions">
-
-                <a
-                    href="demo-image.png"
-                    download="rast-ai-demo-image.png"
-                    class="image-download"
-                >
-                    Download Preview
-                </a>
-
-            </div>
-
-        </div>
-    `;
-
-
-    chatArea.appendChild(
-        imageMessage
-    );
-
-
-    chatArea.scrollTop =
-        chatArea.scrollHeight;
-
-
+    // Re-enable button
     if (generateImageButton) {
 
         generateImageButton.disabled =
             false;
 
-        generateImageButton.textContent =
+        generateImageButton.innerHTML =
             "✦ Generate Image";
+
     }
+
 }
 
 
-// =========================================================
-// IMAGE GENERATOR BUTTON
-// =========================================================
+// ------------------------------------------------------------
+// ADD GENERATED IMAGE PREVIEW
+// ------------------------------------------------------------
 
-if (
-    imagePrompt &&
-    generateImageButton
-) {
+function addGeneratedImage() {
 
-    generateImageButton.addEventListener(
-        "click",
-        () => {
-
-            const prompt =
-                imagePrompt.value.trim();
+    if (!chatArea) return;
 
 
-            if (!prompt) {
-
-                imagePrompt.focus();
-
-                return;
-            }
+    const element =
+        document.createElement("div");
 
 
-            generateImage(
-                prompt
-            );
-        }
+    element.className =
+        "message assistant";
+
+
+    element.innerHTML = `
+
+        <div class="message-bubble image-result">
+
+            <div class="image-result-title">
+                ✦ Design Preview
+            </div>
+
+            <img
+                src="Gemini_Generated_Image_9pr0ap9pr0ap9pr0.png"
+                alt="rast.ai design preview"
+                class="generated-image"
+            >
+
+            <p class="image-result-note">
+                Demo preview — live image generation
+                is being integrated.
+            </p>
+
+            <a
+                href="Gemini_Generated_Image_9pr0ap9pr0ap9pr0.png"
+                download="rast-ai-demo-image.png"
+                class="image-download"
+            >
+                Download Preview
+            </a>
+
+        </div>
+
+    `;
+
+
+    chatArea.appendChild(
+        element
     );
+
+
+    scrollChatToBottom();
+
 }
 
 
-// =========================================================
-// IMAGE PROMPT — CTRL/CMD + ENTER
-// =========================================================
+// ------------------------------------------------------------
+// AUTO RESIZE TEXTAREA
+// ------------------------------------------------------------
 
-if (imagePrompt) {
+function autoResizeTextarea() {
 
-    imagePrompt.addEventListener(
-        "keydown",
-        event => {
+    if (!messageInput) return;
 
-            if (
-                event.key === "Enter" &&
-                (
-                    event.ctrlKey ||
-                    event.metaKey
-                )
-            ) {
 
-                event.preventDefault();
+    messageInput.style.height =
+        "auto";
 
-                generateImage(
-                    imagePrompt.value
-                );
-            }
-        }
-    );
+
+    messageInput.style.height =
+        `${Math.min(
+            messageInput.scrollHeight,
+            180
+        )}px`;
+
 }
 
 
-// =========================================================
-// STARTUP
-// =========================================================
+// ------------------------------------------------------------
+// SCROLL CHAT
+// ------------------------------------------------------------
 
-showWelcome();
+function scrollChatToBottom() {
 
-setMode("chat");
+    if (!chatArea) return;
 
-messageInput.focus();
+
+    setTimeout(() => {
+
+        chatArea.scrollTo({
+
+            top:
+                chatArea.scrollHeight,
+
+            behavior:
+                "smooth"
+
+        });
+
+    }, 50);
+
+}
